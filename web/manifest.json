@@ -1,0 +1,23 @@
+{
+    "name": "YSI",
+    "short_name": "YSI",
+    "start_url": ".",
+    "display": "fullscreen",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "曜聖國際問卷系統",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Ysimssc_Logo_192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Ysimssc_Logo_512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

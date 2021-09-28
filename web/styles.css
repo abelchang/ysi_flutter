@@ -1,0 +1,25 @@
+.ysi_logo {
+    margin: 0;
+    position: absolute;
+    top: 50%; 
+    left: 45%;
+    /* margin-right: -50%; */
+    /* transform: translate(-50%, -50%) */
+    
+    /* margin: 40% auto; */
+   
+}
+
+.ysi_logo img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 80px;
+    text-align: center;
+}
+
+html,
+body {
+    background-color: #343B43;
+}
