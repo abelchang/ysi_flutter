@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ysi/models/project.dart';
 import 'package:ysi/network_utils/api.dart';
 import 'package:ysi/services/sharedPref.dart';
 
@@ -18,6 +19,30 @@ class ProjectService {
       };
     } else {
       result = {'success': false, 'message': json.decode(response)['message']};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> createProject(Project project) async {
+    var result;
+
+    final Map<String, dynamic> projectData = {
+      'project': project,
+    };
+
+    var response = await Network().postData(projectData, '/project/save');
+    if (response['success'] != null) {
+      if (response['success'] == true) {
+        result = {'success': true, 'project': project};
+      } else {
+        result = {
+          'success': false,
+          'message': response,
+        };
+      }
+    } else {
+      return response;
     }
 
     return result;

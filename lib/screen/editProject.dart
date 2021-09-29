@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:ysi/models/company.dart';
 import 'package:ysi/models/project.dart';
+import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/services/sharedPref.dart';
 import 'package:ysi/widgets/styles.dart';
 import 'package:intl/intl.dart';
@@ -19,11 +21,12 @@ class _EditProjectState extends State<EditProject> {
   ScrollController _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
   final _openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
-  Project project = Project(name: '');
+  Project project = Project(name: '', company: Company(name: ''));
   TextEditingController _selectionStartController = TextEditingController();
   TextEditingController _selectionEndController = TextEditingController();
   List<Company?> companies = [];
-  List<String>? companiesData = ['1', '1', '1'];
+  List<String>? companiesData = [];
+  bool isLoading = false;
 
   void initState() {
     super.initState();
@@ -43,7 +46,6 @@ class _EditProjectState extends State<EditProject> {
       companiesData = companies.map((e) {
         return e?.name ?? '';
       }).toList();
-      inspect(companiesData);
     });
 
     // _selectionStartController.text =
@@ -83,6 +85,7 @@ class _EditProjectState extends State<EditProject> {
 
   createProjectForm() {
     return Form(
+      key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -140,7 +143,7 @@ class _EditProjectState extends State<EditProject> {
                           ),
                           // labelText: "* 客人姓名 必填項目",
                           hintText: "專案名稱",
-                          errorStyle: TextStyle(color: Colors.red.shade200),
+                          // errorStyle: TextStyle(color: Colors.red.shade200),
                         ),
                         onEditingComplete: () {
                           unfocus();
@@ -173,6 +176,8 @@ class _EditProjectState extends State<EditProject> {
                         child: AbsorbPointer(
                           child: TextFormField(
                             controller: _selectionStartController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             // cursorColor: Colors.grey,
                             keyboardType: TextInputType.datetime,
                             decoration: InputDecoration(
@@ -255,15 +260,20 @@ class _EditProjectState extends State<EditProject> {
                               //       ),
                               // ),
                               mode: Mode.BOTTOM_SHEET,
+                              validator: (value) {
+                                if (value == null) {
+                                  return '請輸入輔導公司';
+                                }
+                              },
                               key: _openDropDownProgKey,
                               items: companiesData,
                               label: "輔導的公司",
                               onChanged: (data) {
                                 if (data != null) {
-                                  project.conpany?.name = data;
+                                  project.company?.name = data;
                                 }
                               },
-                              selectedItem: project.conpany?.name,
+                              selectedItem: project.company?.name,
                               showSearchBox: true,
                               searchFieldProps: TextFieldProps(
                                 decoration: InputDecoration(
@@ -310,7 +320,7 @@ class _EditProjectState extends State<EditProject> {
                               if (data != null && data.isNotEmpty) {
                                 _openDropDownProgKey.currentState
                                     ?.changeSelectedItem(data);
-                                project.conpany?.name = data;
+                                project.company?.name = data;
                                 companiesData!.insert(0, data);
                               }
                             },
@@ -325,6 +335,33 @@ class _EditProjectState extends State<EditProject> {
                         ],
                       ),
                       SizedBox(
+                        height: 32,
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: 32.0),
+                        child: isLoading
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+
+                                    var result = await ProjectService()
+                                        .createProject(project);
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  } else {
+                                    return;
+                                  }
+                                },
+                                child: Text('儲存'),
+                              ),
+                      ),
+
+                      SizedBox(
                         height: 16,
                       ),
                     ],
@@ -335,7 +372,6 @@ class _EditProjectState extends State<EditProject> {
           )
         ],
       ),
-      key: _formKey,
     );
   }
 

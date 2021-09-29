@@ -14,9 +14,9 @@ Project _$ProjectFromJson(Map<String, dynamic> json) => Project(
       qa: json['qa'] == null
           ? null
           : Qa.fromJson(json['qa'] as Map<String, dynamic>),
-      conpany: json['conpany'] == null
+      company: json['company'] == null
           ? null
-          : Company.fromJson(json['conpany'] as Map<String, dynamic>),
+          : Company.fromJson(json['company'] as Map<String, dynamic>),
       answers: (json['answers'] as List<dynamic>?)
           ?.map((e) => Answer.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -31,7 +31,7 @@ Map<String, dynamic> _$ProjectToJson(Project instance) => <String, dynamic>{
       'start': instance.start?.toIso8601String(),
       'end': instance.end?.toIso8601String(),
       'qa': instance.qa,
-      'conpany': instance.conpany,
+      'company': instance.company,
       'answers': instance.answers,
       'linkcodes': instance.linkcodes,
     };

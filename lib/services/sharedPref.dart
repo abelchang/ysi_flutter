@@ -51,8 +51,6 @@ class SharedPref {
           .map((e) =>
               e == null ? null : Company.fromJson(e as Map<String, dynamic>))
           .toList();
-      debugPrint(companies.toString());
-      inspect(companies);
       return companies;
     }
   }

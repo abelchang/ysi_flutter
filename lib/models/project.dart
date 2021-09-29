@@ -17,7 +17,7 @@ class Project {
     this.end,
     this.start,
     this.qa,
-    this.conpany,
+    this.company,
     this.answers,
     this.linkcodes,
     required this.name,
@@ -26,7 +26,7 @@ class Project {
   DateTime? start;
   DateTime? end;
   Qa? qa;
-  Company? conpany;
+  Company? company;
   List<Answer>? answers;
   List<Linkcode>? linkcodes;
 

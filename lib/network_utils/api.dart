@@ -8,7 +8,7 @@ import 'package:ysi/services/sharedPref.dart';
 
 class Network {
   final String _url = 'https://ysi.beabel.com/api/v1';
-  // final String _url = 'https://ysi_backend.test/api/v1';
+  // final String _url = 'http://ysi_backend.test/api/v1';
   //if you are using android studio emulator, change localhost to 10.0.2.2
   var token;
   Dio _dio = Dio(
@@ -21,37 +21,40 @@ class Network {
 
   Future<dynamic> authData(data, apiUrl, BuildContext context) async {
     var fullUrl = _url + apiUrl;
-    debugPrint('authData:' + fullUrl);
+    // debugPrint('authData:' + fullUrl);
     _setDioHeaders();
     try {
       var response = await _dio.post(fullUrl, data: jsonEncode(data));
       return json.decode(response.toString());
     } on DioError catch (e) {
+      debugPrint(e.message);
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
       if (e.response != null) {
-        debugPrint(e.response?.data);
+        debugPrint(e.response.toString());
         // print(e.response?.headers);
         // print(e.response?.statusCode);
       } else {
         // Something happened in setting up or sending the request that triggered an Error
-        debugPrint(e.error);
-        debugPrint(e.message);
+        debugPrint(e.response.toString());
       }
-      return json.decode(e.response!.data);
+      // return json.decode(e.response!.data);
     }
   }
 
   Future<dynamic> getData(apiUrl) async {
-    debugPrint('get date from: $apiUrl');
+    // debugPrint('get date from: $apiUrl');
     var fullUrl = _url + apiUrl;
     await _getToken();
     _setDioHeaders();
     try {
       final response = await _dio.get(fullUrl);
-      debugPrint('response: $response');
+
       return json.decode(response.toString());
     } on DioError catch (e) {
+      debugPrint(e.message);
+      debugPrint('response:' + e.response.toString());
+
       if (e.response!.statusCode == 401) {
         SharedPref().removeUserData();
         return json.decode(e.response!.data);
@@ -71,13 +74,17 @@ class Network {
     await _getToken();
     _setDioHeaders();
     try {
+      // debugPrint(jsonEncode(data));
       final response = await _dio.post(fullUrl, data: jsonEncode(data));
-      debugPrint('response: $response');
+      // debugPrint('response: $response');
       return json.decode(response.toString());
     } on DioError catch (e) {
+      debugPrint(e.message);
+      debugPrint('response:' + e.response.toString());
+
       if (e.response!.statusCode == 401) {
         SharedPref().removeUserData();
-        return json.decode(e.response!.data);
+        return json.decode(e.response.toString());
       }
     }
   }
