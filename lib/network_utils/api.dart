@@ -28,17 +28,9 @@ class Network {
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx and is also not 304.
       if (e.response != null) {
-        debugPrint(e.response.toString());
-        // print(e.response?.headers);
-        // print(e.response?.statusCode);
-      } else {
-        // Something happened in setting up or sending the request that triggered an Error
-        debugPrint(e.response.toString());
+        debugPrint('response:' + e.response.toString());
       }
-      // return json.decode(e.response!.data);
     }
   }
 
@@ -53,7 +45,9 @@ class Network {
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
-      debugPrint('response:' + e.response.toString());
+      if (e.response != null) {
+        debugPrint('response:' + e.response.toString());
+      }
 
       if (e.response!.statusCode == 401) {
         SharedPref().removeUserData();
@@ -76,12 +70,13 @@ class Network {
     try {
       // debugPrint(jsonEncode(data));
       final response = await _dio.post(fullUrl, data: jsonEncode(data));
-      // debugPrint('response: $response');
+      debugPrint('response: $response');
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
-      debugPrint('response:' + e.response.toString());
-
+      if (e.response != null) {
+        debugPrint('response:' + e.response.toString());
+      }
       if (e.response!.statusCode == 401) {
         SharedPref().removeUserData();
         return json.decode(e.response.toString());
@@ -92,14 +87,19 @@ class Network {
   postUnData(data, apiUrl) async {
     var fullUrl = _url + apiUrl;
     _setDioHeaders();
-    // try {
-    //   final response = await _dio.post(fullUrl, data: jsonEncode(data));
-    //   return response.toString();
-    // } catch (e) {
-    //   print(e);
-    // }
-    final response = await _dio.post(fullUrl, data: jsonEncode(data));
-    return json.decode(response.toString());
+    try {
+      final response = await _dio.post(fullUrl, data: jsonEncode(data));
+      return json.decode(response.toString());
+    } on DioError catch (e) {
+      debugPrint(e.message);
+      if (e.response != null) {
+        debugPrint('response:' + e.response.toString());
+      }
+      if (e.response!.statusCode == 401) {
+        SharedPref().removeUserData();
+        return json.decode(e.response.toString());
+      }
+    }
   }
 
   Future<dynamic> postAPICall(data, apiUrl, BuildContext context) async {
@@ -109,8 +109,15 @@ class Network {
     try {
       final response = await _dio.post(fullUrl, data: jsonEncode(data));
       return json.decode(response.toString());
-    } catch (e) {
-      print(e);
+    } on DioError catch (e) {
+      debugPrint(e.message);
+      if (e.response != null) {
+        debugPrint('response:' + e.response.toString());
+      }
+      if (e.response!.statusCode == 401) {
+        SharedPref().removeUserData();
+        return json.decode(e.response.toString());
+      }
     }
   }
 

@@ -1,0 +1,579 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:ysi/models/aoption.dart';
+
+import 'package:ysi/models/project.dart';
+import 'package:ysi/models/qa.dart';
+import 'package:ysi/models/question.dart';
+import 'package:ysi/services/projectSerivce.dart';
+import 'package:ysi/widgets/styles.dart';
+import 'package:intl/intl.dart';
+
+class EditQA extends StatefulWidget {
+  final Project project;
+  const EditQA({
+    Key? key,
+    required this.project,
+  }) : super(key: key);
+
+  @override
+  _EditQAState createState() => _EditQAState();
+}
+
+class _EditQAState extends State<EditQA> {
+  ScrollController _scrollController = ScrollController();
+  final _formKey = GlobalKey<FormState>();
+  Qa qa = Qa(questions: []);
+  bool isLoading = false;
+  Project project = Project(name: '', qa: Qa(questions: []));
+  List<TextEditingController> questionControllers = [];
+  List<List<TextEditingController>> optionControllers = [[], []];
+
+  void initState() {
+    super.initState();
+    initQa();
+  }
+
+  initQa() {
+    project = widget.project;
+    if (widget.project.qa != null) {
+      qa = widget.project.qa!;
+      questionControllers = [];
+      for (var i = 0; i < qa.questions!.length; i++) {
+        questionControllers.add(TextEditingController());
+        questionControllers[i].text = qa.questions![i].title!;
+        for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
+          optionControllers[i].add(TextEditingController());
+          optionControllers[i][o].text = qa.questions![i].aoptions![o].title!;
+        }
+      }
+    } else {
+      addQuestion();
+    }
+  }
+
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('專案問卷'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () async {
+              setState(() {
+                addQuestion();
+                if (_scrollController.position.minScrollExtent !=
+                    _scrollController.position.maxScrollExtent) {
+                  _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent + 146,
+                      duration: Duration(milliseconds: 1000),
+                      curve: Curves.ease);
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: GestureDetector(
+        onTap: unfocus,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: 1024),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                  bottom: 16,
+                ),
+                child: createQa(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _getQuestions() {
+    List<Widget> questionsTextFields = [];
+    for (int i = 0; i < qa.questions!.length; i++) {
+      questionsTextFields.add(_title(i));
+    }
+    return questionsTextFields;
+  }
+
+  unfocus() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+      currentFocus.focusedChild!.unfocus();
+    }
+  }
+
+  addQuestion() {
+    questionControllers.add(TextEditingController());
+    optionControllers.add([]);
+    optionControllers[qa.questions!.length].add(TextEditingController());
+    setState(() {
+      Question qJson =
+          Question(no: qa.questions!.length + 1, aoptions: [Aoption(no: 1)]);
+      qa.questions!.add(qJson);
+      qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
+    });
+    debugPrint('add a question');
+    inspect(qa.questions);
+  }
+
+  removeQuestion(int index) {
+    print('delete index:' + index.toString());
+    setState(() {
+      qa.questions!.removeAt(index);
+      questionControllers.removeAt(index);
+      qa.questions!.map((e) {
+        var i = qa.questions!.indexOf(e);
+        e.no = i + 1;
+        print('e.no:' + e.no.toString());
+        print('e.title:' + e.title!);
+      }).toList();
+    });
+
+    debugPrint('remove a $index question');
+    inspect(qa.questions);
+  }
+
+  addOption(int qIndex, int oIndex) {
+    optionControllers[qIndex].add(TextEditingController());
+    setState(() {
+      Aoption qJson = Aoption(no: oIndex);
+      qa.questions![qIndex].aoptions!.add(qJson);
+      qa.questions![qIndex].aoptions?.sort((a, b) => a.no!.compareTo(b.no!));
+    });
+    debugPrint('add a option');
+
+    inspect(qa.questions![qIndex]);
+  }
+
+  removeOption(int qIndex, int oIndex) {
+    setState(() {
+      qa.questions![qIndex].aoptions!.removeAt(oIndex);
+      optionControllers[qIndex].removeAt(oIndex);
+      qa.questions![qIndex].aoptions!.map((e) {
+        var i = qa.questions![qIndex].aoptions!.indexOf(e);
+        e.no = i + 1;
+      }).toList();
+    });
+    debugPrint('remove a option');
+    inspect(qa.questions![qIndex]);
+  }
+
+  Widget createQa() {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 16,
+          ),
+          projectInfo(),
+          Text(
+            '問卷',
+            style: TextStyle(fontSize: 22),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Form(
+            key: _formKey,
+            child: qaName(),
+          ),
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    addQuestion();
+                    if (_scrollController.position.minScrollExtent !=
+                        _scrollController.position.maxScrollExtent) {
+                      _scrollController.animateTo(
+                          _scrollController.position.maxScrollExtent + 257,
+                          duration: Duration(milliseconds: 800),
+                          curve: Curves.ease);
+                    }
+                  });
+                },
+                child: Icon(Icons.add, color: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(8),
+                  // primary: Colors.blue, // <-- Button color
+                  // onPrimary: Colors.red, // <-- Splash color
+                ),
+              ),
+              isLoading
+                  ? CircularProgressIndicator(
+                      color: whiteSmoke,
+                    )
+                  : editButton(),
+              ElevatedButton(
+                onPressed: () {},
+                child: Icon(Icons.save, color: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(8),
+                  // primary: Colors.blue, // <-- Button color
+                  // onPrimary: Colors.red, // <-- Splash color
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget qaName() {
+    return Column(
+      children: [
+        Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ThemeData.light().colorScheme.copyWith(
+                  secondary: blueGrey,
+                  primary: lightBrown,
+                ),
+            textTheme: ThemeData.light().textTheme.apply(
+                  fontFamily: 'googlesan',
+                ),
+            primaryTextTheme: ThemeData.light().textTheme.apply(
+                  fontFamily: 'googlesan',
+                ),
+          ),
+          child: Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20))),
+            color: whiteSmoke,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Colors.redAccent[100]!, width: 8)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "問卷名稱",
+                    labelStyle: TextStyle(),
+                  ),
+                  initialValue: qa.name,
+                  // cursorColor: whiteSmoke,
+                  scrollPadding: EdgeInsets.all(90),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return '此欄位不能留空';
+                    } else {
+                      qa.name = value;
+                      return null;
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        // Column(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   children: qa.questions!.length > 0
+        //       ? qa.questions!.map((item) {
+        //           var i = qa.questions!.indexOf(item);
+        //           return _title(i);
+        //         }).toList()
+        //       : [],
+        // ),
+        ..._getQuestions(),
+      ],
+    );
+  }
+
+  projectInfo() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 16,
+        ),
+        Card(
+          color: darkBlueGrey.withOpacity(.4),
+          shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(20.0)),
+          margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              title: Text(widget.project.name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('輔導公司：' + widget.project.company!.name!),
+                  Text(
+                    '專案期間: ' +
+                        DateFormat('yyyy/MM/dd').format(widget.project.start!) +
+                        ' - ' +
+                        DateFormat("MM/dd").format(widget.project.end!),
+                  ),
+                ],
+              ),
+              leading: Icon(
+                Icons.receipt_long,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _title(int index) {
+    return Theme(
+      data: ThemeData.light().copyWith(
+        colorScheme: ThemeData.light().colorScheme.copyWith(
+              secondary: blueGrey,
+              primary: lightBrown,
+            ),
+        textTheme: ThemeData.light().textTheme.apply(
+              fontFamily: 'googlesan',
+            ),
+        primaryTextTheme: ThemeData.light().textTheme.apply(
+              fontFamily: 'googlesan',
+            ),
+      ),
+      child: Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20))),
+        color: whiteSmoke,
+        margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(left: BorderSide(color: lightBrown, width: 8)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ListTile(
+                  // leading: Text('題號.${index + 1}'),
+                  leading: CircleAvatar(
+                    child: Text('${index + 1}'),
+                    backgroundColor: Colors.grey,
+                    foregroundColor: Colors.white,
+                  ),
+
+                  subtitle: TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 5,
+                    controller: questionControllers[index],
+                    // initialValue: qa.questions![index].title,
+                    // cursorColor: whiteSmoke,
+                    scrollPadding: EdgeInsets.all(90),
+
+                    decoration: InputDecoration(
+                      hintText: "題目描述",
+                      hintStyle: TextStyle(fontSize: 14),
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return '此欄位不能留空';
+                      } else {
+                        qa.questions![index].title = value;
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 24,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: index >= 0
+                      ? qa.questions![index].aoptions!.map((item) {
+                          var i = qa.questions![index].aoptions!.indexOf(item);
+                          return _option(i, index);
+                        }).toList()
+                      : [],
+                ),
+                Divider(),
+                ButtonBar(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.remove,
+                        color: darkBlueGrey,
+                      ),
+                      onPressed: () async {
+                        removeQuestion(index);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: darkBlueGrey,
+                      ),
+                      onPressed: () async {
+                        addOption(
+                            index, qa.questions![index].aoptions!.length + 1);
+                        if (_scrollController.position.minScrollExtent !=
+                            _scrollController.position.maxScrollExtent) {
+                          _scrollController.animateTo(
+                              _scrollController.offset + 56,
+                              duration: Duration(milliseconds: 1000),
+                              curve: Curves.ease);
+                        }
+                        print('_scrollController.offset:' +
+                            _scrollController.offset.toString());
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _option(int oIndex, int qIndex) => Padding(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text('選項${oIndex + 1}:'),
+                SizedBox(width: 8),
+                Expanded(
+                  child: TextFormField(
+                    controller: optionControllers[qIndex][oIndex],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    style: TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      hintText: "選項描述",
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: const EdgeInsets.only(
+                          left: 15, top: 8, right: 15, bottom: 0),
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 5,
+                    scrollPadding: EdgeInsets.all(90),
+                    // cursorColor: whiteSmoke,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return '此欄位不能留空';
+                      } else {
+                        qa.questions![qIndex].aoptions![oIndex].title = value;
+                        qa.questions![qIndex].aoptions![oIndex].score =
+                            qa.questions![qIndex].aoptions![oIndex].no;
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.clear,
+                    color: darkBlueGrey,
+                  ),
+                  onPressed: () async {
+                    removeOption(qIndex, oIndex);
+                  },
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8,
+            ),
+          ],
+        ),
+      );
+
+  // _onUpdate(int index, String val) async {
+  //   int foundKey = qa.questions!.indexWhere((element) => index == element.no);
+  //   if (-1 != foundKey) {
+  //     qa.questions![foundKey].title = val;
+  //   } else {
+  //     Question qJson =
+  //         Question(no: index, title: val, aoptions: [Aoption(no: 1)]);
+  //     qa.questions!.add(qJson);
+  //   }
+  //   qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
+  //   debugPrint(jsonEncode(qa.questions));
+  // }
+
+  // _optionUpdate(int oIndex, int qIndex, String val) async {
+  //   int foundKey = qa.questions![qIndex].aoptions!
+  //       .indexWhere((element) => oIndex == element.no);
+  //   if (-1 != foundKey) {
+  //     qa.questions![qIndex].aoptions![foundKey].title = val;
+  //   } else {
+  //     Aoption qJson = Aoption(no: oIndex, title: val);
+  //     qa.questions![qIndex].aoptions!.add(qJson);
+  //   }
+  //   qa.questions![qIndex].aoptions?.sort((a, b) => a.no!.compareTo(b.no!));
+  //   debugPrint(jsonEncode(qa.questions));
+  // }
+
+  editButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        if (_formKey.currentState!.validate()) {
+          setState(() {
+            isLoading = true;
+          });
+          project.qa = qa;
+          var result = await ProjectService().createProject(project);
+          setState(() {
+            if (result['success']) {
+              project = result['project'];
+              debugPrint('res project success:' + jsonEncode(project));
+            }
+            isLoading = false;
+          });
+          Navigator.of(context).pop(project);
+        } else {
+          return;
+        }
+      },
+      child: Icon(Icons.save, color: Colors.white),
+      style: ElevatedButton.styleFrom(
+        shape: CircleBorder(),
+        padding: EdgeInsets.all(8),
+      ),
+    );
+  }
+}

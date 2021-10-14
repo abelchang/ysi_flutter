@@ -14,6 +14,7 @@ part 'project.g.dart';
 @JsonSerializable()
 class Project {
   Project({
+    this.id,
     this.end,
     this.start,
     this.qa,
@@ -22,6 +23,7 @@ class Project {
     this.linkcodes,
     required this.name,
   });
+  int? id;
   String name;
   DateTime? start;
   DateTime? end;

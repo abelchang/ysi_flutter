@@ -7,6 +7,7 @@ part of 'project.dart';
 // **************************************************************************
 
 Project _$ProjectFromJson(Map<String, dynamic> json) => Project(
+      id: json['id'] as int?,
       end: json['end'] == null ? null : DateTime.parse(json['end'] as String),
       start: json['start'] == null
           ? null
@@ -27,6 +28,7 @@ Project _$ProjectFromJson(Map<String, dynamic> json) => Project(
     );
 
 Map<String, dynamic> _$ProjectToJson(Project instance) => <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'start': instance.start?.toIso8601String(),
       'end': instance.end?.toIso8601String(),

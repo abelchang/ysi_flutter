@@ -9,8 +9,8 @@ part 'user.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class User {
-  User({this.name, this.email});
-
+  User({this.name, this.email, this.id});
+  int? id;
   String? name;
   String? email;
 

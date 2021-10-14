@@ -9,9 +9,11 @@ part of 'answer.dart';
 Answer _$AnswerFromJson(Map<String, dynamic> json) => Answer(
       score: json['score'] as int?,
       qnumber: json['qnumber'] as int?,
+      id: json['id'] as int?,
     );
 
 Map<String, dynamic> _$AnswerToJson(Answer instance) => <String, dynamic>{
+      'id': instance.id,
       'score': instance.score,
       'qnumber': instance.qnumber,
     };

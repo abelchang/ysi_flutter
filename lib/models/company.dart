@@ -9,8 +9,8 @@ part 'company.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class Company {
-  Company({this.name});
-
+  Company({this.name, this.id});
+  int? id;
   String? name;
 
   /// A necessary factory constructor for creating a new Company instance

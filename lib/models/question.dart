@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:ysi/models/option.dart';
+import 'package:ysi/models/aoption.dart';
 
 /// This allows the `User` class to access private members in
 /// the generated file. The value for this is *.g.dart, where
@@ -10,11 +10,11 @@ part 'question.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class Question {
-  Question({this.no, this.title, this.options});
-
+  Question({this.no, this.title, this.aoptions, this.id});
+  int? id;
   String? title;
   int? no;
-  List<Option>? options;
+  List<Aoption>? aoptions;
 
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.

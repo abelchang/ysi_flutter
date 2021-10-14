@@ -9,8 +9,8 @@ part 'linkcode.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class Linkcode {
-  Linkcode({this.code, this.count, this.name});
-
+  Linkcode({this.code, this.count, this.name, this.id});
+  int? id;
   String? code;
   String? name;
   int? count;

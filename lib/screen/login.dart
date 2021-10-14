@@ -96,6 +96,7 @@ class _LoginState extends State<Login> {
                                         TextFormField(
                                           autovalidateMode: AutovalidateMode
                                               .onUserInteraction,
+                                          scrollPadding: EdgeInsets.all(90),
                                           textInputAction: TextInputAction.next,
                                           // scrollPadding: EdgeInsets.only(
                                           //     bottom: MediaQuery.of(context)
@@ -130,6 +131,7 @@ class _LoginState extends State<Login> {
                                         TextFormField(
                                           autovalidateMode: AutovalidateMode
                                               .onUserInteraction,
+                                          scrollPadding: EdgeInsets.all(90),
                                           textInputAction: TextInputAction.done,
                                           // scrollPadding: EdgeInsets.all(
                                           //     MediaQuery.of(context)
@@ -179,9 +181,7 @@ class _LoginState extends State<Login> {
                                                   left: 10,
                                                   right: 10),
                                               child: Text(
-                                                _isLoading
-                                                    ? 'Proccessing...'
-                                                    : 'Login',
+                                                _isLoading ? '認證中...' : '登入',
                                                 textDirection:
                                                     TextDirection.ltr,
                                                 style: TextStyle(

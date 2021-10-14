@@ -10,8 +10,13 @@ part 'qa.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class Qa {
-  Qa({this.name, this.questions});
+  Qa({
+    this.name,
+    this.questions,
+    this.id,
+  });
 
+  String? id;
   String? name;
   List<Question>? questions;
 

@@ -9,9 +9,10 @@ part 'answer.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable(explicitToJson: true)
 class Answer {
+  int? id;
   int? score;
   int? qnumber;
-  Answer({this.score, this.qnumber});
+  Answer({this.score, this.qnumber, this.id});
 
   /// A necessary factory constructor for creating a new Answer instance
   /// from a map. Pass the map to the generated `_$AnswerFromJson()` constructor.
