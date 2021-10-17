@@ -222,26 +222,6 @@ class _LoginState extends State<Login> {
                               style: TextStyle(color: Color(0xFFE7E5E5)),
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.only(top: 20),
-                          //   child: InkWell(
-                          //     onTap: () {
-                          //       Navigator.push(
-                          //           context,
-                          //           new MaterialPageRoute(
-                          //               builder: (context) => Register()));
-                          //     },
-                          //     child: Text(
-                          //       'Create new Account',
-                          //       style: TextStyle(
-                          //         color: Colors.white,
-                          //         fontSize: 15.0,
-                          //         decoration: TextDecoration.none,
-                          //         fontWeight: FontWeight.normal,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),

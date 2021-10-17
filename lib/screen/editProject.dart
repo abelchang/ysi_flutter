@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ysi/models/company.dart';
 import 'package:ysi/models/project.dart';
 import 'package:ysi/screen/editQa.dart';
@@ -21,7 +22,8 @@ class EditProject extends StatefulWidget {
 
 class _EditProjectState extends State<EditProject> {
   ScrollController _scrollController = ScrollController();
-  final _formKey = GlobalKey<FormState>();
+  final _projectFormKey = GlobalKey<FormState>();
+  final _linkCodesformKey = GlobalKey<FormState>();
   final _openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
   Project? project;
   TextEditingController _selectionStartController = TextEditingController();
@@ -90,7 +92,7 @@ class _EditProjectState extends State<EditProject> {
           )
         : ElevatedButton(
             onPressed: () async {
-              if (_formKey.currentState!.validate()) {
+              if (_projectFormKey.currentState!.validate()) {
                 setState(() {
                   isLoading = true;
                 });
@@ -146,7 +148,7 @@ class _EditProjectState extends State<EditProject> {
           height: 16,
         ),
         Text(
-          '問卷資料',
+          '問卷內容',
           style: TextStyle(fontSize: 22),
         ),
         SizedBox(
@@ -206,7 +208,7 @@ class _EditProjectState extends State<EditProject> {
 
   createProjectForm() {
     return Form(
-      key: _formKey,
+      key: _projectFormKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -376,7 +378,7 @@ class _EditProjectState extends State<EditProject> {
                           Expanded(
                             flex: 4,
                             child: DropdownSearch<String>(
-                              mode: Mode.BOTTOM_SHEET,
+                              mode: Mode.MENU,
                               enabled: isEdit,
                               autoValidateMode:
                                   AutovalidateMode.onUserInteraction,
@@ -409,67 +411,34 @@ class _EditProjectState extends State<EditProject> {
                                   labelText: "搜尋輔導公司",
                                 ),
                               ),
-                              popupTitle: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: darkBlueGrey,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
-                                  ),
-                                ),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: 640),
-                                  child: Center(
-                                    child: Text(
-                                      '輔導的公司',
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        // fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              popupShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(24),
-                                  topRight: Radius.circular(24),
-                                ),
-                              ),
-                              // dropdownBuilder: (context, selectedItems) {
-                              //   if (selectedItems!.isEmpty) {
-                              //     return ListTile(
-                              //       contentPadding: EdgeInsets.all(0),
-                              //       leading: CircleAvatar(),
-                              //       title: Text("尚未選擇"),
-                              //     );
-                              //   } else {
-                              //     return Text(selectedItems);
-                              //   }
-                              // },
-                              // popupItemBuilder: (BuildContext context,
-                              //     String? item, bool isSelected) {
-                              //   return Container(
-                              //       margin: EdgeInsets.symmetric(horizontal: 8),
-                              //       decoration: !isSelected
-                              //           ? null
-                              //           : BoxDecoration(
-                              //               border: Border.all(
-                              //                   color: Theme.of(context)
-                              //                       .primaryColor),
-                              //               borderRadius:
-                              //                   BorderRadius.circular(5),
-                              //               color: Colors.white,
-                              //             ),
-                              //       child: Center(
-                              //         child: Text(
-                              //           item ?? '',
-                              //           style: TextStyle(fontSize: 18),
-                              //         ),
-                              //       ));
-                              // },
+                              popupBackgroundColor: whiteSmoke,
+
+                              // popupTitle: Container(
+                              //   height: 50,
+                              //   decoration: BoxDecoration(
+                              //     color: darkBlueGrey,
+                              //     borderRadius: BorderRadius.only(
+                              //       topLeft: Radius.circular(20),
+                              //       topRight: Radius.circular(20),
+                              //     ),
+                              //   ),
+                              //   child: Center(
+                              //     child: Text(
+                              //       '輔導的公司',
+                              //       style: TextStyle(
+                              //         fontSize: 24,
+                              //         // fontWeight: FontWeight.bold,
+                              //         color: Colors.white,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                              // popupShape: RoundedRectangleBorder(
+                              //   borderRadius: BorderRadius.only(
+                              //     topLeft: Radius.circular(24),
+                              //     topRight: Radius.circular(24),
+                              //   ),
+                              // ),
                             ),
                           ),
                           ElevatedButton(
@@ -519,6 +488,157 @@ class _EditProjectState extends State<EditProject> {
     );
   }
 
+  createLinkCodes() {
+    return Form(
+      key: _linkCodesformKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            height: 16,
+          ),
+          Text(
+            '分卷資料',
+            style: TextStyle(fontSize: 22),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 640),
+            child: Theme(
+              data: ThemeData.light().copyWith(
+                colorScheme: ThemeData.light().colorScheme.copyWith(
+                      secondary: blueGrey,
+                      primary: lightBrown,
+                    ),
+                textTheme: ThemeData.light().textTheme.apply(
+                      fontFamily: 'googlesan',
+                    ),
+                primaryTextTheme: ThemeData.light().textTheme.apply(
+                      fontFamily: 'googlesan',
+                    ),
+              ),
+              child: Card(
+                color: whiteSmoke,
+                shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0)),
+                margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      ..._getLinkCodes(),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: 32.0),
+                        child: isLoading
+                            ? CircularProgressIndicator()
+                            : editButton(),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _getLinkCodes() {
+    List<Widget> linkCodeTextFields = [];
+    for (int i = 0; i < project!.linkcodes!.length; i++) {
+      linkCodeTextFields.add(_linkCodeForm(i));
+    }
+    return linkCodeTextFields;
+  }
+
+  Widget _linkCodeForm(int i) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '分卷${i + 1}：',
+          style: TextStyle(fontSize: 18, color: lightBrown),
+        ),
+        TextFormField(
+          initialValue: project!.linkcodes![i].name,
+          scrollPadding: EdgeInsets.all(90),
+          enabled: isEdit,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.apartment,
+            ),
+            labelText: "分卷名稱",
+          ),
+          onEditingComplete: () {
+            unfocus();
+          },
+          onTap: () {
+            // _focuserr = null;
+          },
+          validator: (value) {
+            if (value!.isEmpty) {
+              return '請輸入分卷名稱';
+            }
+            project!.linkcodes![i].name = value;
+          },
+        ),
+        TextFormField(
+          initialValue: project!.linkcodes![i].count.toString(),
+          scrollPadding: EdgeInsets.all(90),
+          enabled: isEdit,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.apartment,
+            ),
+            labelText: "分卷數量",
+          ),
+          onEditingComplete: () {
+            unfocus();
+          },
+          onTap: () {
+            // _focuserr = null;
+          },
+          validator: (value) {
+            if (value!.isEmpty) {
+              return '請輸入分卷數量';
+            }
+            project!.linkcodes![i].count = int.parse(value);
+          },
+        ),
+        TextFormField(
+          initialValue: project!.linkcodes![i].code,
+          scrollPadding: EdgeInsets.all(90),
+          enabled: false,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.apartment,
+            ),
+            labelText: "分卷連結",
+          ),
+          onEditingComplete: () {
+            unfocus();
+          },
+        ),
+        SizedBox(
+          height: 16,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -541,6 +661,11 @@ class _EditProjectState extends State<EditProject> {
                       width: 0,
                     )
                   : createQAForm(),
+              (project?.linkcodes != null)
+                  ? createLinkCodes()
+                  : SizedBox(
+                      height: 0,
+                    ),
             ],
           ),
         ),

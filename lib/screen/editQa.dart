@@ -47,7 +47,8 @@ class _EditQAState extends State<EditQA> {
         questionControllers[i].text = qa.questions![i].title!;
         for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
           optionControllers[i].add(TextEditingController());
-          optionControllers[i][o].text = qa.questions![i].aoptions![o].title!;
+          optionControllers[i][o].text =
+              qa.questions![i].aoptions![o].title ?? '';
         }
       }
     } else {
@@ -197,7 +198,15 @@ class _EditQAState extends State<EditQA> {
           ),
           Form(
             key: _formKey,
-            child: qaName(),
+            child: Column(
+              children: [
+                qaName(),
+                SizedBox(
+                  height: 16,
+                ),
+                ..._getQuestions(),
+              ],
+            ),
           ),
           ButtonBar(
             alignment: MainAxisAlignment.center,
@@ -215,29 +224,19 @@ class _EditQAState extends State<EditQA> {
                     }
                   });
                 },
-                child: Icon(Icons.add, color: Colors.white),
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(8),
-                  // primary: Colors.blue, // <-- Button color
-                  // onPrimary: Colors.red, // <-- Splash color
-                ),
+                child: Text('新增題目'),
+                // style: ElevatedButton.styleFrom(
+                //   shape: CircleBorder(),
+                //   padding: EdgeInsets.all(8),
+                //   // primary: Colors.blue, // <-- Button color
+                //   // onPrimary: Colors.red, // <-- Splash color
+                // ),
               ),
               isLoading
                   ? CircularProgressIndicator(
                       color: whiteSmoke,
                     )
                   : editButton(),
-              ElevatedButton(
-                onPressed: () {},
-                child: Icon(Icons.save, color: Colors.white),
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(8),
-                  // primary: Colors.blue, // <-- Button color
-                  // onPrimary: Colors.red, // <-- Splash color
-                ),
-              ),
             ],
           ),
         ],
@@ -246,70 +245,55 @@ class _EditQAState extends State<EditQA> {
   }
 
   Widget qaName() {
-    return Column(
-      children: [
-        Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ThemeData.light().colorScheme.copyWith(
-                  secondary: blueGrey,
-                  primary: lightBrown,
-                ),
-            textTheme: ThemeData.light().textTheme.apply(
-                  fontFamily: 'googlesan',
-                ),
-            primaryTextTheme: ThemeData.light().textTheme.apply(
-                  fontFamily: 'googlesan',
-                ),
+    return Theme(
+      data: ThemeData.light().copyWith(
+        colorScheme: ThemeData.light().colorScheme.copyWith(
+              secondary: blueGrey,
+              primary: lightBrown,
+            ),
+        textTheme: ThemeData.light().textTheme.apply(
+              fontFamily: 'googlesan',
+            ),
+        primaryTextTheme: ThemeData.light().textTheme.apply(
+              fontFamily: 'googlesan',
+            ),
+      ),
+      child: Card(
+        // shape: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.only(
+        //   bottomLeft: Radius.circular(20),
+        //   bottomRight: Radius.circular(20),
+        // )),
+        color: whiteSmoke,
+        child: Container(
+          decoration: BoxDecoration(
+            // borderRadius: BorderRadius.all(Radius.circular(20)),
+            border: Border(
+                top: BorderSide(color: Colors.redAccent[100]!, width: 8)),
           ),
-          child: Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20))),
-            color: whiteSmoke,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: Colors.redAccent[100]!, width: 8)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: "問卷名稱",
+                labelStyle: TextStyle(),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "問卷名稱",
-                    labelStyle: TextStyle(),
-                  ),
-                  initialValue: qa.name,
-                  // cursorColor: whiteSmoke,
-                  scrollPadding: EdgeInsets.all(90),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return '此欄位不能留空';
-                    } else {
-                      qa.name = value;
-                      return null;
-                    }
-                  },
-                ),
-              ),
+              initialValue: qa.name,
+              // cursorColor: whiteSmoke,
+              scrollPadding: EdgeInsets.all(90),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return '此欄位不能留空';
+                } else {
+                  qa.name = value;
+                  return null;
+                }
+              },
             ),
           ),
         ),
-        SizedBox(
-          height: 16,
-        ),
-        // Column(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   children: qa.questions!.length > 0
-        //       ? qa.questions!.map((item) {
-        //           var i = qa.questions!.indexOf(item);
-        //           return _title(i);
-        //         }).toList()
-        //       : [],
-        // ),
-        ..._getQuestions(),
-      ],
+      ),
     );
   }
 
@@ -368,8 +352,8 @@ class _EditQAState extends State<EditQA> {
       child: Card(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20))),
+                // topRight: Radius.circular(20),
+                bottomRight: Radius.circular(35))),
         color: whiteSmoke,
         margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
         child: Container(
@@ -428,20 +412,7 @@ class _EditQAState extends State<EditQA> {
                 Divider(),
                 ButtonBar(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.remove,
-                        color: darkBlueGrey,
-                      ),
-                      onPressed: () async {
-                        removeQuestion(index);
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.add,
-                        color: darkBlueGrey,
-                      ),
+                    TextButton(
                       onPressed: () async {
                         addOption(
                             index, qa.questions![index].aoptions!.length + 1);
@@ -455,6 +426,13 @@ class _EditQAState extends State<EditQA> {
                         print('_scrollController.offset:' +
                             _scrollController.offset.toString());
                       },
+                      child: Text('增加選項'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        removeQuestion(index);
+                      },
+                      child: Text('移除此題'),
                     ),
                   ],
                 ),
@@ -522,32 +500,6 @@ class _EditQAState extends State<EditQA> {
         ),
       );
 
-  // _onUpdate(int index, String val) async {
-  //   int foundKey = qa.questions!.indexWhere((element) => index == element.no);
-  //   if (-1 != foundKey) {
-  //     qa.questions![foundKey].title = val;
-  //   } else {
-  //     Question qJson =
-  //         Question(no: index, title: val, aoptions: [Aoption(no: 1)]);
-  //     qa.questions!.add(qJson);
-  //   }
-  //   qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
-  //   debugPrint(jsonEncode(qa.questions));
-  // }
-
-  // _optionUpdate(int oIndex, int qIndex, String val) async {
-  //   int foundKey = qa.questions![qIndex].aoptions!
-  //       .indexWhere((element) => oIndex == element.no);
-  //   if (-1 != foundKey) {
-  //     qa.questions![qIndex].aoptions![foundKey].title = val;
-  //   } else {
-  //     Aoption qJson = Aoption(no: oIndex, title: val);
-  //     qa.questions![qIndex].aoptions!.add(qJson);
-  //   }
-  //   qa.questions![qIndex].aoptions?.sort((a, b) => a.no!.compareTo(b.no!));
-  //   debugPrint(jsonEncode(qa.questions));
-  // }
-
   editButton() {
     return ElevatedButton(
       onPressed: () async {
@@ -569,11 +521,11 @@ class _EditQAState extends State<EditQA> {
           return;
         }
       },
-      child: Icon(Icons.save, color: Colors.white),
-      style: ElevatedButton.styleFrom(
-        shape: CircleBorder(),
-        padding: EdgeInsets.all(8),
-      ),
+      child: Text('儲存'),
+      // style: ElevatedButton.styleFrom(
+      //   shape: CircleBorder(),
+      //   padding: EdgeInsets.all(8),
+      // ),
     );
   }
 }
