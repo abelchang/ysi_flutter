@@ -11,6 +11,7 @@ Linkcode _$LinkcodeFromJson(Map<String, dynamic> json) => Linkcode(
       count: json['count'] as int?,
       name: json['name'] as String?,
       id: json['id'] as int?,
+      url: json['url'] as String?,
     );
 
 Map<String, dynamic> _$LinkcodeToJson(Linkcode instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$LinkcodeToJson(Linkcode instance) => <String, dynamic>{
       'code': instance.code,
       'name': instance.name,
       'count': instance.count,
+      'url': instance.url,
     };

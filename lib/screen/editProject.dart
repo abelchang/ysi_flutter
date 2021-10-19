@@ -1,6 +1,7 @@
 // import 'dart:developer';
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,8 @@ class _EditProjectState extends State<EditProject> {
 
   iniProject() async {
     if (widget.project == null) {
-      project = Project(id: -1, name: '', company: Company(name: ''));
+      project =
+          Project(id: -1, name: '', company: Company(name: ''), linkcodes: []);
       setState(() {
         isEdit = true;
       });
@@ -485,6 +487,8 @@ class _EditProjectState extends State<EditProject> {
   }
 
   createLinkCodes() {
+    // debugPrint('createLinkCodes');
+    // inspect(project);
     return Form(
       key: _linkCodesformKey,
       child: Column(
@@ -521,7 +525,7 @@ class _EditProjectState extends State<EditProject> {
                     borderRadius: new BorderRadius.circular(20.0)),
                 margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       ..._getLinkCodes(),
@@ -554,97 +558,114 @@ class _EditProjectState extends State<EditProject> {
   }
 
   Widget _linkCodeForm(int i) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 16,
-        ),
-        Container(
-          decoration: BoxDecoration(
-            // borderRadius: BorderRadius.all(Radius.circular(16)),
-            border: Border(
-              top: BorderSide(color: lightBrown.withOpacity(.8), width: 4),
+    return Card(
+      shape:
+          RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+      margin: EdgeInsets.only(top: 8, bottom: 16, left: 4, right: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 16,
             ),
-            // color: lightBrown,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(
-              '分卷${i + 1}',
-              // style: TextStyle(color: Colors.white),
+            Container(
+              decoration: BoxDecoration(
+                // borderRadius: BorderRadius.all(Radius.circular(16)),
+                border: Border(
+                  top: BorderSide(color: lightBrown.withOpacity(.8), width: 4),
+                ),
+                // color: lightBrown,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Text(
+                  '分卷${i + 1}',
+                  // style: TextStyle(color: Colors.white),
+                ),
+              ),
             ),
-          ),
-        ),
-        TextFormField(
-          initialValue: project!.linkcodes![i].name,
-          scrollPadding: EdgeInsets.all(90),
-          enabled: isEdit,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.receipt_long,
-            ),
-            labelText: "分卷名稱",
-          ),
-          onTap: () {
-            // _focuserr = null;
-          },
-          validator: (value) {
-            if (value!.isEmpty) {
-              return '請輸入分卷名稱';
-            }
-            project!.linkcodes![i].name = value;
-          },
-        ),
-        TextFormField(
-          initialValue: project!.linkcodes![i].count.toString(),
-          scrollPadding: EdgeInsets.all(90),
-          enabled: isEdit,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.article,
-            ),
-            labelText: "分卷數量",
-          ),
-          onTap: () {
-            // _focuserr = null;
-          },
-          validator: (value) {
-            if (value!.isEmpty) {
-              return '請輸入分卷數量';
-            }
-            project!.linkcodes![i].count = int.parse(value);
-          },
-        ),
-        TextFormField(
-          initialValue: project!.linkcodes![i].code,
-          scrollPadding: EdgeInsets.all(90),
-          enabled: true,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.share,
-            ),
-            labelText: "分卷連結",
-            suffixIcon: IconButton(
-              onPressed: () {
-                Clipboard.setData(
-                        ClipboardData(text: project!.linkcodes![i].code))
-                    .whenComplete(() => showDialogMgs(context, '分卷連結複製完成'));
+            TextFormField(
+              initialValue: project!.linkcodes![i].name,
+              scrollPadding: EdgeInsets.all(90),
+              enabled: isEdit,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.receipt_long,
+                ),
+                labelText: "分卷名稱",
+              ),
+              onTap: () {
+                // _focuserr = null;
               },
-              icon: Icon(Icons.content_copy),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return '請輸入分卷名稱';
+                }
+                project!.linkcodes![i].name = value;
+              },
             ),
-          ),
+            TextFormField(
+              initialValue: project!.linkcodes![i].count.toString(),
+              scrollPadding: EdgeInsets.all(90),
+              enabled: isEdit,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.article,
+                ),
+                labelText: "分卷數量",
+              ),
+              onTap: () {
+                // _focuserr = null;
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return '請輸入分卷數量';
+                }
+                project!.linkcodes![i].count = int.parse(value);
+              },
+            ),
+            SizedBox(
+              height: 24,
+            ),
+            TextFormField(
+              initialValue: Uri.base.toString() + project!.linkcodes![i].code!,
+              scrollPadding: EdgeInsets.all(90),
+              readOnly: true,
+              enableInteractiveSelection: true,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(),
+                ),
+                prefixIcon: Icon(
+                  Icons.share,
+                ),
+                labelText: "分卷連結",
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(
+                            text: Uri.base.toString() +
+                                project!.linkcodes![i].code!))
+                        .whenComplete(() => showDialogMgs(context, '分卷連結複製完成'));
+                  },
+                  icon: Icon(Icons.content_copy),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+          ],
         ),
-        SizedBox(
-          height: 16,
-        ),
-      ],
+      ),
     );
   }
 
@@ -670,11 +691,12 @@ class _EditProjectState extends State<EditProject> {
                       width: 0,
                     )
                   : createQAForm(),
-              (project?.linkcodes != null)
-                  ? createLinkCodes()
-                  : SizedBox(
-                      height: 0,
-                    ),
+              if (project?.linkcodes == null || project?.linkcodes!.length == 0)
+                SizedBox(
+                  height: 0,
+                )
+              else
+                createLinkCodes(),
               SizedBox(
                 height: 32,
               ),

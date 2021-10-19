@@ -21,7 +21,7 @@ class ProjectService {
       };
     } else {
       result = {
-        'success': true,
+        'success': false,
       };
     }
     return result;
@@ -45,7 +45,7 @@ class ProjectService {
         'companies': companies,
       };
     } else {
-      result = {'success': false, 'message': json.decode(response)['message']};
+      result = {'success': false, 'message': response['message']};
     }
 
     return result;
@@ -95,7 +95,7 @@ class ProjectService {
         'projects': projects,
       };
     } else {
-      result = {'success': false, 'message': json.decode(response)['message']};
+      result = {'success': false, 'message': response['message']};
     }
 
     return result;

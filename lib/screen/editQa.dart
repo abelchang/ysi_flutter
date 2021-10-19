@@ -61,6 +61,12 @@ class _EditQAState extends State<EditQA> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
+    for (var i = 0; i < qa.questions!.length; i++) {
+      questionControllers[i].dispose();
+      for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
+        optionControllers[i][o].dispose();
+      }
+    }
   }
 
   @override
@@ -157,6 +163,7 @@ class _EditQAState extends State<EditQA> {
     setState(() {
       qa.questions!.removeAt(index);
       questionControllers.removeAt(index);
+      optionControllers.removeAt(index);
       qa.questions!.map((e) {
         var i = qa.questions!.indexOf(e);
         e.no = i + 1;
@@ -433,8 +440,8 @@ class _EditQAState extends State<EditQA> {
                               duration: Duration(milliseconds: 1000),
                               curve: Curves.ease);
                         }
-                        print('_scrollController.offset:' +
-                            _scrollController.offset.toString());
+                        // print('_scrollController.offset:' +
+                        //     _scrollController.offset.toString());
                       },
                       child: Text('增加選項'),
                     ),

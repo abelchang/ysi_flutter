@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 // import 'package:ysi/screen/forgotPassword.dart';
 import 'package:ysi/screen/home.dart';
 import 'package:ysi/screen/login.dart';
+import 'package:ysi/screen/qaPAge.dart';
 import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/services/sharedPref.dart';
 import 'package:ysi/widgets/styles.dart';
@@ -26,6 +27,19 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
+      onGenerateRoute: (settings) {
+        List<String> pathComponents = settings.name!.split('/');
+        switch (settings.name) {
+          case '/':
+            break;
+          default:
+            return MaterialPageRoute(
+              builder: (context) => Qapage(
+                code: pathComponents.last,
+              ),
+            );
+        }
+      },
       supportedLocales: [
         const Locale('en'),
         const Locale.fromSubtags(languageCode: 'zh'), // generic Chinese 'zh'

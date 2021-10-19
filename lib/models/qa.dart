@@ -15,7 +15,7 @@ class Qa {
     this.questions,
     this.id,
   });
-
+  @JsonKey(name: '_id')
   String? id;
   String? name;
   List<Question>? questions;

@@ -9,11 +9,12 @@ part 'linkcode.g.dart';
 /// JSON serialization logic to be generated.
 @JsonSerializable()
 class Linkcode {
-  Linkcode({this.code, this.count, this.name, this.id});
+  Linkcode({this.code, this.count, this.name, this.id, this.url});
   int? id;
   String? code;
   String? name;
   int? count;
+  String? url;
 
   /// A necessary factory constructor for creating a new Linkcode instance
   /// from a map. Pass the map to the generated `_$LinkcodeFromJson()` constructor.

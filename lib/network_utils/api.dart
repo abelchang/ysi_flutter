@@ -12,7 +12,7 @@ class Network {
   //if you are using android studio emulator, change localhost to 10.0.2.2
   var token;
   Dio _dio = Dio(
-    BaseOptions(connectTimeout: 5000, receiveTimeout: 5000),
+    BaseOptions(connectTimeout: 10000, receiveTimeout: 10000),
   );
 
   _getToken() async {
@@ -21,22 +21,29 @@ class Network {
 
   Future<dynamic> authData(data, apiUrl, BuildContext context) async {
     var fullUrl = _url + apiUrl;
+    var result;
     // debugPrint('authData:' + fullUrl);
     _setDioHeaders();
     try {
       var response = await _dio.post(fullUrl, data: jsonEncode(data));
       return json.decode(response.toString());
     } on DioError catch (e) {
+      result = {
+        'success': false,
+        'message': e.message,
+      };
       debugPrint(e.message);
       if (e.response != null) {
         debugPrint('response:' + e.response.toString());
       }
+      return result;
     }
   }
 
   Future<dynamic> getData(apiUrl) async {
     // debugPrint('get date from: $apiUrl');
     var fullUrl = _url + apiUrl;
+    var result;
     await _getToken();
     _setDioHeaders();
     try {
@@ -44,6 +51,10 @@ class Network {
 
       return json.decode(response.toString());
     } on DioError catch (e) {
+      result = {
+        'success': false,
+        'message': e.message,
+      };
       debugPrint(e.message);
       if (e.response != null) {
         debugPrint('response:' + e.response.toString());
@@ -51,8 +62,8 @@ class Network {
 
       if (e.response!.statusCode == 401) {
         SharedPref().removeUserData();
-        return json.decode(e.response!.data);
       }
+      return result;
     }
   }
 
@@ -64,6 +75,7 @@ class Network {
   // }
 
   postData(data, apiUrl) async {
+    var result;
     var fullUrl = _url + apiUrl;
     await _getToken();
     _setDioHeaders();
@@ -74,36 +86,46 @@ class Network {
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
+      result = {
+        'success': false,
+        'message': e.message,
+      };
       if (e.response != null) {
         debugPrint('response:' + e.response.toString());
       }
-      if (e.response!.statusCode == 401) {
+      if (e.response?.statusCode == 401) {
         SharedPref().removeUserData();
-        return json.decode(e.response.toString());
       }
+      return result;
     }
   }
 
   postUnData(data, apiUrl) async {
     var fullUrl = _url + apiUrl;
+    var result;
     _setDioHeaders();
     try {
       final response = await _dio.post(fullUrl, data: jsonEncode(data));
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
+      result = {
+        'success': false,
+        'message': e.message,
+      };
       if (e.response != null) {
         debugPrint('response:' + e.response.toString());
       }
-      if (e.response!.statusCode == 401) {
+      if (e.response?.statusCode == 401) {
         SharedPref().removeUserData();
-        return json.decode(e.response.toString());
       }
+      return result;
     }
   }
 
   Future<dynamic> postAPICall(data, apiUrl, BuildContext context) async {
     var fullUrl = _url + apiUrl;
+    var result;
     await _getToken();
     _setDioHeaders();
     try {
@@ -111,13 +133,17 @@ class Network {
       return json.decode(response.toString());
     } on DioError catch (e) {
       debugPrint(e.message);
+      result = {
+        'success': false,
+        'message': e.message,
+      };
       if (e.response != null) {
         debugPrint('response:' + e.response.toString());
       }
-      if (e.response!.statusCode == 401) {
+      if (e.response?.statusCode == 401) {
         SharedPref().removeUserData();
-        return json.decode(e.response.toString());
       }
+      return result;
     }
   }
 
