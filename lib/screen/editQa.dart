@@ -30,7 +30,7 @@ class _EditQAState extends State<EditQA> {
   bool isLoading = false;
   Project project = Project(name: '', qa: Qa(questions: []));
   List<TextEditingController> questionControllers = [];
-  List<List<TextEditingController>> optionControllers = [[], []];
+  List<List<TextEditingController>> optionControllers = [];
 
   void initState() {
     super.initState();
@@ -42,9 +42,11 @@ class _EditQAState extends State<EditQA> {
     if (widget.project.qa != null) {
       qa = widget.project.qa!;
       questionControllers = [];
+      optionControllers = [];
       for (var i = 0; i < qa.questions!.length; i++) {
         questionControllers.add(TextEditingController());
-        questionControllers[i].text = qa.questions![i].title!;
+        optionControllers.add([]);
+        questionControllers[i].text = qa.questions![i].title ?? '';
         for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
           optionControllers[i].add(TextEditingController());
           optionControllers[i][o].text =
@@ -68,26 +70,37 @@ class _EditQAState extends State<EditQA> {
         title: Text('專案問卷'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () async {
-              setState(() {
-                addQuestion();
-                if (_scrollController.position.minScrollExtent !=
-                    _scrollController.position.maxScrollExtent) {
-                  _scrollController.animateTo(
-                      _scrollController.position.maxScrollExtent + 146,
-                      duration: Duration(milliseconds: 1000),
-                      curve: Curves.ease);
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(Icons.system_update_alt),
             onPressed: () {},
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: isLoading
+          ? CircularProgressIndicator(
+              color: whiteSmoke,
+            )
+          : FloatingActionButton(
+              backgroundColor: lightBrown,
+              child: Text('儲存'),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  project.qa = qa;
+                  var result = await ProjectService().createProject(project);
+                  setState(() {
+                    if (result['success']) {
+                      project = result['project'];
+                      debugPrint('res project success:' + jsonEncode(project));
+                    }
+                    isLoading = false;
+                  });
+                  Navigator.of(context).pop(project);
+                }
+              },
+            ),
       body: GestureDetector(
         onTap: unfocus,
         child: SingleChildScrollView(
@@ -135,8 +148,8 @@ class _EditQAState extends State<EditQA> {
       qa.questions!.add(qJson);
       qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
     });
-    debugPrint('add a question');
-    inspect(qa.questions);
+    // debugPrint('add a question');
+    // inspect(qa.questions);
   }
 
   removeQuestion(int index) {
@@ -147,13 +160,11 @@ class _EditQAState extends State<EditQA> {
       qa.questions!.map((e) {
         var i = qa.questions!.indexOf(e);
         e.no = i + 1;
-        print('e.no:' + e.no.toString());
-        print('e.title:' + e.title!);
       }).toList();
     });
 
-    debugPrint('remove a $index question');
-    inspect(qa.questions);
+    // debugPrint('remove a $index question');
+    // inspect(qa.questions);
   }
 
   addOption(int qIndex, int oIndex) {
@@ -163,9 +174,8 @@ class _EditQAState extends State<EditQA> {
       qa.questions![qIndex].aoptions!.add(qJson);
       qa.questions![qIndex].aoptions?.sort((a, b) => a.no!.compareTo(b.no!));
     });
-    debugPrint('add a option');
-
-    inspect(qa.questions![qIndex]);
+    // debugPrint('add a option');
+    // inspect(qa.questions![qIndex]);
   }
 
   removeOption(int qIndex, int oIndex) {
@@ -177,8 +187,8 @@ class _EditQAState extends State<EditQA> {
         e.no = i + 1;
       }).toList();
     });
-    debugPrint('remove a option');
-    inspect(qa.questions![qIndex]);
+    // debugPrint('remove a option');
+    // inspect(qa.questions![qIndex]);
   }
 
   Widget createQa() {
@@ -232,11 +242,11 @@ class _EditQAState extends State<EditQA> {
                 //   // onPrimary: Colors.red, // <-- Splash color
                 // ),
               ),
-              isLoading
-                  ? CircularProgressIndicator(
-                      color: whiteSmoke,
-                    )
-                  : editButton(),
+              // isLoading
+              //     ? CircularProgressIndicator(
+              //         color: whiteSmoke,
+              //       )
+              //     : editButton(),
             ],
           ),
         ],

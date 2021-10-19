@@ -9,6 +9,7 @@ import 'package:ysi/models/company.dart';
 import 'package:ysi/models/project.dart';
 import 'package:ysi/screen/editQa.dart';
 import 'package:ysi/services/projectSerivce.dart';
+import 'package:ysi/widgets/showMsg.dart';
 import 'package:ysi/widgets/styles.dart';
 import 'package:intl/intl.dart';
 
@@ -92,6 +93,7 @@ class _EditProjectState extends State<EditProject> {
           )
         : ElevatedButton(
             onPressed: () async {
+              unfocus();
               if (_projectFormKey.currentState!.validate()) {
                 setState(() {
                   isLoading = true;
@@ -264,12 +266,6 @@ class _EditProjectState extends State<EditProject> {
                           ),
                           hintText: "專案名稱",
                         ),
-                        onEditingComplete: () {
-                          unfocus();
-                        },
-                        onTap: () {
-                          // _focuserr = null;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
                             return '請輸入專案名稱';
@@ -559,11 +555,25 @@ class _EditProjectState extends State<EditProject> {
 
   Widget _linkCodeForm(int i) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '分卷${i + 1}：',
-          style: TextStyle(fontSize: 18, color: lightBrown),
+        SizedBox(
+          height: 16,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            // borderRadius: BorderRadius.all(Radius.circular(16)),
+            border: Border(
+              top: BorderSide(color: lightBrown.withOpacity(.8), width: 4),
+            ),
+            // color: lightBrown,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(
+              '分卷${i + 1}',
+              // style: TextStyle(color: Colors.white),
+            ),
+          ),
         ),
         TextFormField(
           initialValue: project!.linkcodes![i].name,
@@ -573,13 +583,10 @@ class _EditProjectState extends State<EditProject> {
           keyboardType: TextInputType.text,
           decoration: InputDecoration(
             prefixIcon: Icon(
-              Icons.apartment,
+              Icons.receipt_long,
             ),
             labelText: "分卷名稱",
           ),
-          onEditingComplete: () {
-            unfocus();
-          },
           onTap: () {
             // _focuserr = null;
           },
@@ -599,13 +606,10 @@ class _EditProjectState extends State<EditProject> {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             prefixIcon: Icon(
-              Icons.apartment,
+              Icons.article,
             ),
             labelText: "分卷數量",
           ),
-          onEditingComplete: () {
-            unfocus();
-          },
           onTap: () {
             // _focuserr = null;
           },
@@ -619,18 +623,23 @@ class _EditProjectState extends State<EditProject> {
         TextFormField(
           initialValue: project!.linkcodes![i].code,
           scrollPadding: EdgeInsets.all(90),
-          enabled: false,
+          enabled: true,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           keyboardType: TextInputType.text,
           decoration: InputDecoration(
             prefixIcon: Icon(
-              Icons.apartment,
+              Icons.share,
             ),
             labelText: "分卷連結",
+            suffixIcon: IconButton(
+              onPressed: () {
+                Clipboard.setData(
+                        ClipboardData(text: project!.linkcodes![i].code))
+                    .whenComplete(() => showDialogMgs(context, '分卷連結複製完成'));
+              },
+              icon: Icon(Icons.content_copy),
+            ),
           ),
-          onEditingComplete: () {
-            unfocus();
-          },
         ),
         SizedBox(
           height: 16,
@@ -666,6 +675,9 @@ class _EditProjectState extends State<EditProject> {
                   : SizedBox(
                       height: 0,
                     ),
+              SizedBox(
+                height: 32,
+              ),
             ],
           ),
         ),
