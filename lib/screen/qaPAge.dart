@@ -103,7 +103,7 @@ class _QapageState extends State<Qapage> {
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * .2,
+            height: MediaQuery.of(context).size.height * .15,
             color: darkBlueGrey3,
             child: Align(
                 alignment: Alignment.center,
@@ -116,12 +116,12 @@ class _QapageState extends State<Qapage> {
                 )),
           ),
           Positioned(
-            top: MediaQuery.of(context).size.height * .15,
+            top: MediaQuery.of(context).size.height * .1,
             child: Container(
               constraints: BoxConstraints(maxWidth: 1024),
               width: MediaQuery.of(context).size.width * .95,
               height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).size.height * .15,
+                  MediaQuery.of(context).size.height * .1,
               child: Column(
                 children: [
                   Card(
