@@ -13,7 +13,11 @@ import 'package:ysi/widgets/styles.dart';
 class Qapage extends StatefulWidget {
   final code;
   final bool preview;
-  const Qapage({Key? key, this.code, this.preview = false}) : super(key: key);
+  Qapage({
+    Key? key,
+    this.code,
+    this.preview = false,
+  }) : super(key: key);
 
   @override
   _QapageState createState() => _QapageState();
@@ -99,7 +103,7 @@ class _QapageState extends State<Qapage> {
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
-            height: 200,
+            height: MediaQuery.of(context).size.height * .2,
             color: darkBlueGrey3,
             child: Align(
                 alignment: Alignment.center,
@@ -112,11 +116,12 @@ class _QapageState extends State<Qapage> {
                 )),
           ),
           Positioned(
-            top: 150,
+            top: MediaQuery.of(context).size.height * .15,
             child: Container(
               constraints: BoxConstraints(maxWidth: 1024),
               width: MediaQuery.of(context).size.width * .95,
-              height: MediaQuery.of(context).size.height - 150,
+              height: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).size.height * .15,
               child: Column(
                 children: [
                   Card(
@@ -182,47 +187,7 @@ class _QapageState extends State<Qapage> {
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   ),
-                            sending
-                                ? CircularProgressIndicator()
-                                : ElevatedButton(
-                                    onPressed: () async {
-                                      if (this.mounted) {
-                                        setState(() {
-                                          sending = true;
-                                          errormessage = '';
-                                        });
-                                      }
-
-                                      List<int> errorNo = [];
-                                      for (var i = 0; i < answers.length; i++) {
-                                        if (answers[i].score == null) {
-                                          errorNo.add(answers[i].qnumber!);
-                                        }
-                                      }
-                                      if (errorNo.isEmpty) {
-                                        var result = await ProjectService()
-                                            .saveAnswers(answers);
-                                        if (result['success']) {
-                                          print('success');
-                                          pageMessage = '恭喜您填寫完成，可以關閉視窗囉！';
-                                          isPage = true;
-                                        } else {
-                                          print('fault');
-                                        }
-                                      } else {
-                                        errorNo.join(" ");
-                                        errormessage = "您還有第" +
-                                            errorNo.join(" ") +
-                                            "題還沒有填寫喔！";
-                                      }
-                                      if (this.mounted) {
-                                        setState(() {
-                                          sending = false;
-                                        });
-                                      }
-                                    },
-                                    child: Text('送出'),
-                                  ),
+                            sending ? CircularProgressIndicator() : qaButton(),
                             SizedBox(
                               height: 64,
                             ),
@@ -238,6 +203,51 @@ class _QapageState extends State<Qapage> {
         ],
       ),
     );
+  }
+
+  Widget qaButton() {
+    return widget.preview
+        ? ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('返回'))
+        : ElevatedButton(
+            onPressed: () async {
+              if (this.mounted) {
+                setState(() {
+                  sending = true;
+                  errormessage = '';
+                });
+              }
+
+              List<int> errorNo = [];
+              for (var i = 0; i < answers.length; i++) {
+                if (answers[i].score == null) {
+                  errorNo.add(answers[i].qnumber!);
+                }
+              }
+              if (errorNo.isEmpty) {
+                var result = await ProjectService().saveAnswers(answers);
+                if (result['success']) {
+                  print('success');
+                  pageMessage = '恭喜您填寫完成，可以關閉視窗囉！';
+                  isPage = true;
+                } else {
+                  print('fault');
+                }
+              } else {
+                errorNo.join(" ");
+                errormessage = "您還有第" + errorNo.join(",") + "題還沒有填寫喔！";
+              }
+              if (this.mounted) {
+                setState(() {
+                  sending = false;
+                });
+              }
+            },
+            child: Text('送出'),
+          );
   }
 
   Center page(String message) => Center(

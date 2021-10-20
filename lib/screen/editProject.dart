@@ -53,9 +53,11 @@ class _EditProjectState extends State<EditProject> {
     if (widget.project == null) {
       project =
           Project(id: -1, name: '', company: Company(name: ''), linkcodes: []);
-      setState(() {
-        isEdit = true;
-      });
+      if (this.mounted) {
+        setState(() {
+          isEdit = true;
+        });
+      }
     } else {
       project = widget.project;
       _selectionStartController.text =
@@ -69,11 +71,13 @@ class _EditProjectState extends State<EditProject> {
     if (res['success'] == true) {
       print('get comapnies success');
       companies = res['companies'];
-      setState(() {
-        companiesData = companies.map((e) {
-          return e?.name ?? '';
-        }).toList();
-      });
+      if (this.mounted) {
+        setState(() {
+          companiesData = companies.map((e) {
+            return e?.name ?? '';
+          }).toList();
+        });
+      }
     }
   }
 
@@ -88,9 +92,11 @@ class _EditProjectState extends State<EditProject> {
     return !isEdit
         ? ElevatedButton(
             onPressed: () {
-              setState(() {
-                isEdit = true;
-              });
+              if (this.mounted) {
+                setState(() {
+                  isEdit = true;
+                });
+              }
             },
             child: Text('編輯'),
           )
@@ -98,20 +104,24 @@ class _EditProjectState extends State<EditProject> {
             onPressed: () async {
               unfocus();
               if (_projectFormKey.currentState!.validate()) {
-                setState(() {
-                  isLoading = true;
-                });
+                if (this.mounted) {
+                  setState(() {
+                    isLoading = true;
+                  });
+                }
 
                 var result = await ProjectService().createProject(project!);
-                setState(() {
-                  if (result['success']) {
-                    project = result['project'];
-                    debugPrint('res project success:' + jsonEncode(project));
-                  }
-                  isLoading = false;
-                  isEdit = false;
-                  isNew = false;
-                });
+                if (this.mounted) {
+                  setState(() {
+                    if (result['success']) {
+                      project = result['project'];
+                      debugPrint('res project success:' + jsonEncode(project));
+                    }
+                    isLoading = false;
+                    isEdit = false;
+                    isNew = false;
+                  });
+                }
               } else {
                 return;
               }
@@ -189,9 +199,11 @@ class _EditProjectState extends State<EditProject> {
                             )),
                   ).then((value) {
                     if (value != null) {
-                      setState(() {
-                        project = value;
-                      });
+                      if (this.mounted) {
+                        setState(() {
+                          project = value;
+                        });
+                      }
                     }
                   });
                 },
@@ -282,13 +294,15 @@ class _EditProjectState extends State<EditProject> {
                             : () async {
                                 var date = await _showDatePicker();
                                 if (date != null) {
-                                  setState(() {
-                                    project?.start = date!;
-                                    _selectionStartController.text =
-                                        DateFormat('yyy/MM/dd')
-                                            .format(date!)
-                                            .toString();
-                                  });
+                                  if (this.mounted) {
+                                    setState(() {
+                                      project?.start = date!;
+                                      _selectionStartController.text =
+                                          DateFormat('yyy/MM/dd')
+                                              .format(date!)
+                                              .toString();
+                                    });
+                                  }
                                 }
                                 unfocus();
                               },
@@ -324,13 +338,15 @@ class _EditProjectState extends State<EditProject> {
                             : () async {
                                 var date = await _showDatePicker();
                                 if (date != null) {
-                                  setState(() {
-                                    project!.end = date;
-                                    _selectionEndController.text =
-                                        DateFormat('yyy/MM/dd')
-                                            .format(date)
-                                            .toString();
-                                  });
+                                  if (this.mounted) {
+                                    setState(() {
+                                      project!.end = date;
+                                      _selectionEndController.text =
+                                          DateFormat('yyy/MM/dd')
+                                              .format(date)
+                                              .toString();
+                                    });
+                                  }
                                 }
 
                                 unfocus();
@@ -671,6 +687,7 @@ class _EditProjectState extends State<EditProject> {
                       MaterialPageRoute(
                         builder: (context) => Qapage(
                           code: project!.linkcodes![i].code,
+                          preview: true,
                         ),
                       ));
                 },
