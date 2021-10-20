@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:ysi/models/company.dart';
 import 'package:ysi/models/project.dart';
 import 'package:ysi/screen/editQa.dart';
+import 'package:ysi/screen/qaPAge.dart';
 import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/widgets/showMsg.dart';
 import 'package:ysi/widgets/styles.dart';
@@ -663,6 +664,17 @@ class _EditProjectState extends State<EditProject> {
             SizedBox(
               height: 16,
             ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Qapage(
+                          code: project!.linkcodes![i].code,
+                        ),
+                      ));
+                },
+                child: Text('預覽'))
           ],
         ),
       ),

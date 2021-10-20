@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:ysi/models/answer.dart';
 import 'package:ysi/models/company.dart';
+import 'package:ysi/models/linkcode.dart';
 import 'package:ysi/models/project.dart';
+import 'package:ysi/models/qa.dart';
 import 'package:ysi/network_utils/api.dart';
 import 'package:ysi/services/sharedPref.dart';
 
@@ -96,6 +99,50 @@ class ProjectService {
       };
     } else {
       result = {'success': false, 'message': response['message']};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getQa(String code) async {
+    var result;
+    var response = await Network().getData("/qa/$code");
+    if (response['success'] == true) {
+      result = {
+        'success': true,
+        'qa': Qa.fromJson(response['qa']),
+        'linkcode': Linkcode.fromJson(response['linkcode']),
+      };
+    } else {
+      result = {'success': false, 'message': response['message']};
+    }
+    return result;
+  }
+
+  Future<Map<String, dynamic>> saveAnswers(List<Answer> answers) async {
+    var result;
+
+    final Map<String, dynamic> answersData = {
+      'answers': answers,
+    };
+    debugPrint('request:' + json.encode(answersData));
+
+    var response = await Network().postData(answersData, '/answer/save');
+    if (response['success'] != null) {
+      if (response['success'] == true) {
+        result = {
+          'success': true,
+        };
+      } else {
+        result = {
+          'success': false,
+          'message': response['message'],
+        };
+      }
+    } else {
+      result = {
+        'success': false,
+      };
     }
 
     return result;

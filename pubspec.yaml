@@ -37,6 +37,8 @@ dependencies:
   flutter_spinkit: ^5.1.0
   dart_date: ^1.1.0
   dropdown_search: ^1.0.0
+  step_progress_indicator: ^1.0.1
+  animated_text_kit: ^4.2.1
   
 dev_dependencies:
   flutter_test:
