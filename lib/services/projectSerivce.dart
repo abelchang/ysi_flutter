@@ -54,10 +54,12 @@ class ProjectService {
     return result;
   }
 
-  Future<Map<String, dynamic>> createProject(Project project) async {
+  Future<Map<String, dynamic>> createProject(Project project,
+      {bool checkSample = false}) async {
     var result;
 
     final Map<String, dynamic> projectData = {
+      'checkSample': checkSample,
       'project': project,
     };
     debugPrint('request:' + json.encode(projectData));
@@ -143,6 +145,29 @@ class ProjectService {
       result = {
         'success': false,
       };
+    }
+
+    return result;
+  }
+
+  Future getAllSamples() async {
+    var result;
+    List<Qa?>? samples;
+    var response = await Network().getData("/qsample/getall");
+    if (response['success'] == true) {
+      if (response['samples'] != null) {
+        samples = (response['samples'] as List)
+            .map((e) =>
+                e == null ? null : Qa.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+
+      result = {
+        'success': true,
+        'samples': samples,
+      };
+    } else {
+      result = {'success': false, 'message': response['message']};
     }
 
     return result;

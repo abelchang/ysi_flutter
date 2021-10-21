@@ -106,14 +106,15 @@ class _QapageState extends State<Qapage> {
             height: MediaQuery.of(context).size.height * .15,
             color: darkBlueGrey3,
             child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '曜聖國際問卷系統',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                  ),
-                )),
+              alignment: Alignment.center,
+              child: Text(
+                '曜聖國際問卷系統',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                ),
+              ),
+            ),
           ),
           Positioned(
             top: MediaQuery.of(context).size.height * .1,
@@ -262,7 +263,7 @@ class _QapageState extends State<Qapage> {
               animatedTexts: [
                 TypewriterAnimatedText(
                   message,
-                  speed: const Duration(milliseconds: 300),
+                  speed: const Duration(milliseconds: 200),
                 ),
               ],
               totalRepeatCount: 1,

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -9,7 +10,10 @@ import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/services/sharedPref.dart';
 import 'package:ysi/widgets/styles.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  GestureBinding.instance?.resamplingEnabled = true;
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

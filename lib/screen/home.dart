@@ -164,35 +164,42 @@ class _HomeState extends State<Home> {
               onRefresh: () async {
                 _loadProjectData();
               },
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Center(
-                      child: Text(
-                        '最新的專案',
-                        style: TextStyle(fontSize: 22),
+              child: ListView(
+                children: [
+                  Center(
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: 1600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Center(
+                            child: Text(
+                              '最新的專案',
+                              style: TextStyle(fontSize: 22),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          if (projects!.isEmpty)
+                            Center(child: Text('目前沒有專案'))
+                          else
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              alignment: WrapAlignment.start,
+                              children: projects!
+                                  .map((item) => projectCard(item!))
+                                  .toList(),
+                            ),
+                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    if (projects!.isEmpty)
-                      Center(child: Text('目前沒有專案'))
-                    else
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        alignment: WrapAlignment.start,
-                        children: projects!
-                            .map((item) => projectCard(item!))
-                            .toList(),
-                      ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
     );
@@ -222,59 +229,114 @@ class _HomeState extends State<Home> {
             ),
       ),
       child: Container(
-        constraints: BoxConstraints(maxWidth: 420),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('data'),
-              Card(
-                color: Colors.white,
-                elevation: 16,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0)),
-                margin:
-                    EdgeInsets.only(bottom: 16, top: 8, left: 12, right: 12),
-                child: Container(
-                  // alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditProject(
-                                      project: item,
-                                    )),
-                          ).then((value) async {
-                            _loadProjectData();
-                          });
-                        },
-                        title: Text(item.name),
-                        subtitle: Text(item.company!.name!),
-                        leading: Icon(
-                          Icons.receipt_long,
-                        ),
-                        trailing: Icon(Icons.chevron_right),
+        constraints: BoxConstraints(maxWidth: 360),
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              '期間: ' +
+                  DateFormat('yyyy/MM/dd').format(item.start!) +
+                  ' - ' +
+                  DateFormat("MM/dd").format(item.end!),
+            ),
+            Card(
+              color: whiteSmoke,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20))),
+              margin: EdgeInsets.only(bottom: 16, top: 8, left: 12, right: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  border:
+                      Border(bottom: BorderSide(color: lightBrown, width: 4)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      minLeadingWidth: 16,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditProject(
+                                    project: item,
+                                  )),
+                        ).then((value) async {
+                          _loadProjectData();
+                        });
+                      },
+                      title: Text(item.name),
+                      subtitle: Text(item.company!.name!),
+                      leading: Icon(
+                        Icons.receipt_long,
                       ),
-                      Divider(),
-                      Text(
-                        '專案期間: ' +
-                            DateFormat('yyyy-MM-dd').format(item.start!) +
-                            ' - ' +
-                            DateFormat("MM/dd").format(item.end!),
+                      trailing: Icon(Icons.chevron_right),
+                    ),
+                    Divider(),
+                    Container(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '問卷:  ${item.qa?.name ?? '尚未建立'}',
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          ...item.linkcodes!.map((e) => Row(
+                                children: [
+                                  Text('分卷：${e.name}'),
+                                  SizedBox(
+                                    width: 64,
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.baseline,
+                                      textBaseline: TextBaseline.alphabetic,
+                                      children: [
+                                        Text(
+                                          '${e.done}',
+                                          style: TextStyle(
+                                            color: (e.done! > e.count!)
+                                                ? Colors.red[700]
+                                                    ?.withOpacity(.6)
+                                                : Colors.black.withOpacity(0.6),
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' / ${e.count}',
+                                          style: TextStyle(
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )),
+                        ],
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

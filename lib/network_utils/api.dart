@@ -7,8 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:ysi/services/sharedPref.dart';
 
 class Network {
-  final String _url = 'https://ysi.beabel.com/api/v1';
-  // final String _url = 'http://ysi_backend.test/api/v1';
+  // final String _url = 'https://ysi.beabel.com/api/v1';
+  final String _url = 'http://ysi_backend.test/api/v1';
   //if you are using android studio emulator, change localhost to 10.0.2.2
   var token;
   Dio _dio = Dio(
