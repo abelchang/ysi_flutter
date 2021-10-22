@@ -29,20 +29,22 @@ class _HomeState extends State<Home> {
   }
 
   _loadProjectData() async {
-    setState(() {
-      isInit = true;
-    });
-    var projectsData = await ProjectService().getAllProjects();
-    if (projectsData['success']) {
+    if (this.mounted) {
       setState(() {
-        projects = projectsData['projects'];
+        isInit = true;
       });
-    } else {
-      setState(() {
-        projects = [];
-      });
+      var projectsData = await ProjectService().getAllProjects();
+      if (projectsData['success']) {
+        setState(() {
+          projects = projectsData['projects'];
+        });
+      } else {
+        setState(() {
+          projects = [];
+        });
+      }
+      isInit = false;
     }
-    isInit = false;
   }
 
   @override
@@ -195,6 +197,9 @@ class _HomeState extends State<Home> {
                                   .map((item) => projectCard(item!))
                                   .toList(),
                             ),
+                          SizedBox(
+                            height: 32,
+                          ),
                         ],
                       ),
                     ),

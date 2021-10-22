@@ -45,19 +45,7 @@ class _EditQAState extends State<EditQA> {
   initQa() async {
     project = widget.project;
     if (widget.project.qa != null) {
-      qa = widget.project.qa!;
-      questionControllers = [];
-      optionControllers = [];
-      for (var i = 0; i < qa.questions!.length; i++) {
-        questionControllers.add(TextEditingController());
-        optionControllers.add([]);
-        questionControllers[i].text = qa.questions![i].title ?? '';
-        for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
-          optionControllers[i].add(TextEditingController());
-          optionControllers[i][o].text =
-              qa.questions![i].aoptions![o].title ?? '';
-        }
-      }
+      modifyQa(widget.project.qa!);
     } else {
       addQuestion();
     }
@@ -93,17 +81,81 @@ class _EditQAState extends State<EditQA> {
     return Scaffold(
       appBar: AppBar(
         title: Text('專案問卷'),
+        iconTheme: IconThemeData(
+          color: whiteSmoke, //change your color here
+        ),
+        leading: BackButton(),
         actions: [
           (getSample || samples.isEmpty)
               ? SizedBox.shrink()
-              : IconButton(
-                  icon: Icon(Icons.system_update_alt),
-                  onPressed: () async {
-                    await showInformationDialog(context);
-                  },
-                )
+              : Builder(
+                  builder: (context) => IconButton(
+                    icon: Icon(Icons.system_update_alt),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  ),
+                ),
         ],
       ),
+      endDrawer: Drawer(
+          child: Column(
+        children: [
+          Container(
+            height: 128,
+            child: DrawerHeader(
+              decoration: BoxDecoration(
+                color: blueGrey,
+              ),
+              child: Center(
+                child: Text(
+                  '匯入專案範本',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+            ),
+          ),
+          ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            children: [
+              SizedBox(
+                height: 32,
+              ),
+              ...samples.map(
+                (e) => ListTile(
+                  leading: Icon(
+                    Icons.receipt_long,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    e!.name!,
+                    style: TextStyle(color: whiteSmoke),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(
+                      Icons.system_update_alt,
+                      color: whiteSmoke,
+                    ),
+                    onPressed: () {
+                      e.id = qa.id;
+                      debugPrint('sampleData:${e.id}');
+                      debugPrint('Qa:${qa.id}');
+                      if (this.mounted) {
+                        setState(() {
+                          modifyQa(e);
+                        });
+                      }
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 32,
+              ),
+            ],
+          ),
+        ],
+      )),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: isLoading
           ? CircularProgressIndicator(
@@ -147,6 +199,22 @@ class _EditQAState extends State<EditQA> {
         ),
       ),
     );
+  }
+
+  void modifyQa(Qa qaData) {
+    qa = qaData;
+    questionControllers.clear();
+    optionControllers.clear();
+    for (var i = 0; i < qa.questions!.length; i++) {
+      questionControllers.add(TextEditingController());
+      optionControllers.add([]);
+      questionControllers[i].text = qa.questions![i].title ?? '';
+      for (var o = 0; o < qa.questions![i].aoptions!.length; o++) {
+        optionControllers[i].add(TextEditingController());
+        optionControllers[i][o].text =
+            qa.questions![i].aoptions![o].title ?? '';
+      }
+    }
   }
 
   List<Widget> _getQuestions() {
@@ -559,19 +627,34 @@ class _EditQAState extends State<EditQA> {
     );
   }
 
-  Future<void> showInformationDialog(BuildContext context) async {
+  Future<dynamic> showInformationDialog(BuildContext context) async {
     return await showDialog(
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
-            var samplesData = samples;
             return AlertDialog(
               backgroundColor: darkBlueGrey3,
               content: Container(
                 width: 600,
                 height: 600,
                 child: ListView(
-                  children: [...samples.map((e) => Text(e!.name!))],
+                  children: [
+                    ...samples.map(
+                      (e) => CheckboxListTile(
+                        activeColor: lightBrown,
+                        checkColor: whiteSmoke,
+                        controlAffinity: ListTileControlAffinity.platform,
+                        value: false,
+                        title: Text(
+                          e!.name!,
+                          style: TextStyle(color: whiteSmoke),
+                        ),
+                        onChanged: (value) {
+                          Navigator.of(context).pop(e);
+                        },
+                      ),
+                    )
+                  ],
                 ),
               ),
               title: Text('Stateful Dialog'),

@@ -39,6 +39,7 @@ dependencies:
   dropdown_search: ^1.0.0
   step_progress_indicator: ^1.0.1
   animated_text_kit: ^4.2.1
+  flutter_inner_drawer: ^1.0.0+1
   
 dev_dependencies:
   flutter_test:
