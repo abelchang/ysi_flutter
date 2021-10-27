@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:ysi/models/aoption.dart';
 
 import 'package:ysi/models/project.dart';
@@ -13,6 +14,7 @@ import 'package:ysi/widgets/spinkit.dart';
 
 import 'package:ysi/widgets/styles.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
 
 class EditQA extends StatefulWidget {
   final Project project;
@@ -28,6 +30,8 @@ class EditQA extends StatefulWidget {
 class _EditQAState extends State<EditQA> {
   ScrollController _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<InnerDrawerState> _innerDrawerKey =
+      GlobalKey<InnerDrawerState>();
   Qa qa = Qa(questions: []);
   bool isLoading = false;
   bool getSample = false;
@@ -37,9 +41,16 @@ class _EditQAState extends State<EditQA> {
   List<Qa?> samples = [];
   bool checkSample = false;
 
+  double _horizontalOffset = 0.4;
+  double _verticalOffset = 0;
+  bool _topBottom = false;
+  double _scale = 0.8;
+  double _borderRadius = 0;
+
   void initState() {
-    super.initState();
     initQa();
+    // _getwidthContainer();
+    super.initState();
   }
 
   initQa() async {
@@ -78,123 +89,186 @@ class _EditQAState extends State<EditQA> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('專案問卷'),
-        iconTheme: IconThemeData(
-          color: whiteSmoke, //change your color here
-        ),
-        leading: BackButton(),
-        actions: [
-          (getSample || samples.isEmpty)
-              ? SizedBox.shrink()
-              : Builder(
-                  builder: (context) => IconButton(
-                    icon: Icon(Icons.system_update_alt),
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+    return InnerDrawer(
+      key: _innerDrawerKey,
+      onTapClose: true,
+      offset: IDOffset.only(
+          top: _topBottom ? _verticalOffset : 0.0,
+          bottom: !_topBottom ? _verticalOffset : 0.0,
+          right: (MediaQuery.of(context).size.width > 1024)
+              ? 0
+              : _horizontalOffset,
+          left: (MediaQuery.of(context).size.width > 1024)
+              ? 0
+              : _horizontalOffset),
+      scale: IDOffset.horizontal(
+          (MediaQuery.of(context).size.width > 1024) ? 0.9 : _scale),
+      borderRadius: _borderRadius,
+      // duration: Duration(milliseconds: 11200),
+      // swipe: _swipe,
+      // proportionalChildArea: _proportionalChildArea,
+      // backgroundColor: Colors.red,
+
+      // colorTransitionScaffold: Colors.white.withOpacity(.3),
+      // rightAnimationType: _animationType,
+
+      rightChild: Material(
+          color: Theme.of(context).backgroundColor,
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // SizedBox(
+                  //   height: 64,
+                  // ),
+                  // Align(
+                  //   alignment: Alignment.bottomLeft,
+                  //   child: Text(
+                  //     '匯入問卷範本',
+                  //     // style: TextStyle(fontSize: 24),
+                  //   ),
+                  // ),
+                  // Divider(
+                  //   color: lightBrown,
+                  // ),
+                  ListView(
+                    shrinkWrap: true,
+                    children: [
+                      SizedBox(
+                        height: 16,
+                      ),
+                      ...samples.map(
+                        (e) => Column(
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  e!.name!,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                IconButton(
+                                  alignment: Alignment.bottomLeft,
+                                  icon: Icon(
+                                    Icons.system_update_alt,
+                                    color: whiteSmoke,
+                                    size: 14,
+                                  ),
+                                  onPressed: () {
+                                    e.id = qa.id;
+                                    if (this.mounted) {
+                                      setState(() {
+                                        modifyQa(e);
+                                      });
+                                    }
+                                    _innerDrawerKey.currentState!.toggle();
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 48,
+                                ),
+                                // ListTile(
+                                //   dense: true,
+                                //   title: Text(
+                                //     e!.name!,
+                                //     style: TextStyle(color: whiteSmoke),
+                                //   ),
+                                //   trailing: IconButton(
+                                //     icon: Icon(
+                                //       Icons.system_update_alt,
+                                //       color: whiteSmoke,
+                                //     ),
+                                //     onPressed: () {
+                                //       e.id = qa.id;
+                                //       if (this.mounted) {
+                                //         setState(() {
+                                //           modifyQa(e);
+                                //         });
+                                //       }
+                                //       _innerDrawerKey.currentState!.toggle();
+                                //     },
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 32,
+                      ),
+                    ],
                   ),
-                ),
-        ],
-      ),
-      endDrawer: Drawer(
-          child: Column(
-        children: [
-          Container(
-            height: 128,
-            child: DrawerHeader(
-              decoration: BoxDecoration(
-                color: blueGrey,
-              ),
-              child: Center(
-                child: Text(
-                  '匯入專案範本',
-                  style: TextStyle(fontSize: 24),
-                ),
+                ],
               ),
             ),
+          )),
+      scaffold: Scaffold(
+        appBar: AppBar(
+          title: Text('專案問卷'),
+          iconTheme: IconThemeData(
+            color: whiteSmoke, //change your color here
           ),
-          ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            children: [
-              SizedBox(
-                height: 32,
-              ),
-              ...samples.map(
-                (e) => ListTile(
-                  leading: Icon(
-                    Icons.receipt_long,
-                    color: Colors.white,
-                  ),
-                  title: Text(
-                    e!.name!,
-                    style: TextStyle(color: whiteSmoke),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.system_update_alt,
-                      color: whiteSmoke,
+          leading: BackButton(),
+          actions: [
+            (getSample || samples.isEmpty)
+                ? SizedBox.shrink()
+                : Builder(
+                    builder: (context) => IconButton(
+                      icon: Icon(Icons.system_update_alt),
+                      onPressed: () => _innerDrawerKey.currentState!.toggle(),
                     ),
-                    onPressed: () {
-                      e.id = qa.id;
-                      debugPrint('sampleData:${e.id}');
-                      debugPrint('Qa:${qa.id}');
-                      if (this.mounted) {
-                        setState(() {
-                          modifyQa(e);
-                        });
-                      }
-                      Navigator.of(context).pop();
-                    },
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 32,
-              ),
-            ],
-          ),
-        ],
-      )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: isLoading
-          ? CircularProgressIndicator(
-              color: whiteSmoke,
-            )
-          : editButton(),
-      body: GestureDetector(
-        onTap: unfocus,
-        child: Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ThemeData.light().colorScheme.copyWith(
-                  secondary: blueGrey,
-                  primary: lightBrown,
-                ),
-            textTheme: ThemeData.light().textTheme.apply(
-                  fontFamily: 'googlesan',
-                ),
-            primaryTextTheme: ThemeData.light().textTheme.apply(
-                  fontFamily: 'googlesan',
-                ),
-            unselectedWidgetColor: whiteSmoke,
-          ),
-          child: ListView(
-            controller: _scrollController,
-            children: [
-              Center(
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: 1024),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      bottom: 16,
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: isLoading
+            ? CircularProgressIndicator(
+                color: whiteSmoke,
+              )
+            : editButton(),
+        body: GestureDetector(
+          onTap: unfocus,
+          child: Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ThemeData.light().colorScheme.copyWith(
+                    secondary: blueGrey,
+                    primary: lightBrown,
+                  ),
+              textTheme: ThemeData.light().textTheme.apply(
+                    fontFamily: 'googlesan',
+                  ),
+              primaryTextTheme: ThemeData.light().textTheme.apply(
+                    fontFamily: 'googlesan',
+                  ),
+              unselectedWidgetColor: whiteSmoke,
+            ),
+            child: ListView(
+              controller: _scrollController,
+              children: [
+                Center(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: 1024),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8,
+                        right: 8,
+                        bottom: 16,
+                      ),
+                      child: createQa(),
                     ),
-                    child: createQa(),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -236,18 +310,19 @@ class _EditQAState extends State<EditQA> {
     questionControllers.add(TextEditingController());
     optionControllers.add([]);
     optionControllers[qa.questions!.length].add(TextEditingController());
-    setState(() {
-      Question qJson =
-          Question(no: qa.questions!.length + 1, aoptions: [Aoption(no: 1)]);
-      qa.questions!.add(qJson);
-      qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
-    });
+    if (this.mounted) {
+      setState(() {
+        Question qJson =
+            Question(no: qa.questions!.length + 1, aoptions: [Aoption(no: 1)]);
+        qa.questions!.add(qJson);
+        qa.questions?.sort((a, b) => a.no!.compareTo(b.no!));
+      });
+    }
     // debugPrint('add a question');
     // inspect(qa.questions);
   }
 
   removeQuestion(int index) {
-    print('delete index:' + index.toString());
     setState(() {
       qa.questions!.removeAt(index);
       questionControllers.removeAt(index);
@@ -324,10 +399,11 @@ class _EditQAState extends State<EditQA> {
                 style: TextStyle(color: whiteSmoke),
               ),
               onChanged: (value) {
-                setState(() {
-                  checkSample = value!;
-                  debugPrint(checkSample.toString());
-                });
+                if (this.mounted) {
+                  setState(() {
+                    checkSample = value!;
+                  });
+                }
               },
             ),
           ),
@@ -405,7 +481,7 @@ class _EditQAState extends State<EditQA> {
           height: 16,
         ),
         Card(
-          color: darkBlueGrey.withOpacity(.3),
+          color: blueGrey.withOpacity(.2),
           elevation: 3,
           shape: RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(20.0)),
@@ -604,7 +680,6 @@ class _EditQAState extends State<EditQA> {
             isLoading = true;
           });
           project.qa = qa;
-          debugPrint('checkSample:$checkSample');
           var result = await ProjectService()
               .createProject(project, checkSample: checkSample);
           setState(() {
@@ -625,53 +700,5 @@ class _EditQAState extends State<EditQA> {
       //   padding: EdgeInsets.all(8),
       // ),
     );
-  }
-
-  Future<dynamic> showInformationDialog(BuildContext context) async {
-    return await showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: darkBlueGrey3,
-              content: Container(
-                width: 600,
-                height: 600,
-                child: ListView(
-                  children: [
-                    ...samples.map(
-                      (e) => CheckboxListTile(
-                        activeColor: lightBrown,
-                        checkColor: whiteSmoke,
-                        controlAffinity: ListTileControlAffinity.platform,
-                        value: false,
-                        title: Text(
-                          e!.name!,
-                          style: TextStyle(color: whiteSmoke),
-                        ),
-                        onChanged: (value) {
-                          Navigator.of(context).pop(e);
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              title: Text('Stateful Dialog'),
-              actions: <Widget>[
-                InkWell(
-                  child: Text('OK   '),
-                  onTap: () {},
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    print('setSta');
-                  },
-                  child: Text('data'),
-                ),
-              ],
-            );
-          });
-        });
   }
 }

@@ -43,10 +43,10 @@ class _EditProjectState extends State<EditProject> {
   }
 
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
     _selectionStartController.dispose();
     _selectionEndController.dispose();
+    super.dispose();
   }
 
   iniProject() async {

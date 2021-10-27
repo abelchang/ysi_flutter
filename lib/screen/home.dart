@@ -6,6 +6,8 @@ import 'package:ysi/models/project.dart';
 import 'package:ysi/network_utils/api.dart';
 import 'package:ysi/screen/editProject.dart';
 import 'package:ysi/screen/login.dart';
+import 'package:ysi/screen/sample.dart';
+import 'package:ysi/screen/sysAnswers.dart';
 import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/services/sharedPref.dart';
 import 'package:ysi/widgets/styles.dart';
@@ -54,6 +56,15 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('YSI'),
         actions: [
+          // IconButton(
+          //   icon: Icon(Icons.umbrella),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => ExampleTwo()),
+          //     );
+          //   },
+          // ),
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -299,34 +310,38 @@ class _HomeState extends State<Home> {
                                   SizedBox(
                                     width: 64,
                                   ),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.baseline,
-                                      textBaseline: TextBaseline.alphabetic,
-                                      children: [
-                                        Text(
-                                          '${e.done}',
-                                          style: TextStyle(
-                                            color: (e.done! > e.count!)
-                                                ? Colors.red[700]
-                                                    ?.withOpacity(.6)
-                                                : Colors.black.withOpacity(0.6),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.baseline,
+                                        textBaseline: TextBaseline.alphabetic,
+                                        children: [
+                                          Text(
+                                            '${e.done}',
+                                            style: TextStyle(
+                                              color: (e.done! > e.count!)
+                                                  ? Colors.red[700]
+                                                      ?.withOpacity(.6)
+                                                  : Colors.black
+                                                      .withOpacity(0.6),
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          ' / ${e.count}',
-                                          style: TextStyle(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            fontSize: 14,
+                                          Text(
+                                            ' / ${e.count}',
+                                            style: TextStyle(
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                              fontSize: 14,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -334,6 +349,26 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                     ),
+                    (item.linkcodes!.isEmpty)
+                        ? SizedBox.shrink()
+                        : Padding(
+                            padding: const EdgeInsets.only(right: 16.0, top: 8),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: ElevatedButton(
+                                child: Text('分析'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SysAnswers(
+                                              project: item,
+                                            )),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                     SizedBox(
                       height: 16,
                     ),

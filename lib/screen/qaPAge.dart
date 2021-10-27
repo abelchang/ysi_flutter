@@ -9,6 +9,7 @@ import 'package:ysi/models/qa.dart';
 import 'package:ysi/services/projectSerivce.dart';
 import 'package:ysi/widgets/spinkit.dart';
 import 'package:ysi/widgets/styles.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Qapage extends StatefulWidget {
   final code;
@@ -34,12 +35,48 @@ class _QapageState extends State<Qapage> {
   int currentAnswer = 0;
   String errormessage = '';
   String pageMessage = '';
+  ScrollController _scrollController = ScrollController();
+  double titlePosition = 150;
+  double bannerPosition = 200;
+  bool bannerTitle = true;
+
   void initState() {
     super.initState();
     initQa();
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset >= 10) {
+        if (kIsWeb) {
+          if (this.mounted) {
+            setState(() {
+              titlePosition = 0;
+              bannerPosition = 56;
+              bannerTitle = false;
+            });
+          }
+        } else {
+          if (this.mounted) {
+            setState(() {
+              titlePosition = 26;
+              bannerPosition = 72;
+              bannerTitle = false;
+            });
+          }
+        }
+      } else if (_scrollController.offset == 0) {
+        if (this.mounted) {
+          setState(() {
+            titlePosition = 150;
+            bannerPosition = 200;
+            bannerTitle = true;
+          });
+        }
+      }
+    });
   }
 
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -103,79 +140,62 @@ class _QapageState extends State<Qapage> {
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * .15,
+            height: bannerPosition,
             color: darkBlueGrey3,
             child: Align(
               alignment: Alignment.center,
-              child: Text(
-                '曜聖國際問卷系統',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                ),
-              ),
+              child: bannerTitle
+                  ? Text(
+                      '曜聖國際問卷系統',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                      ),
+                    )
+                  : Text(
+                      '',
+                    ),
             ),
           ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * .1,
-            child: Container(
-              constraints: BoxConstraints(maxWidth: 1024),
-              width: MediaQuery.of(context).size.width * .95,
-              height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).size.height * .1,
-              child: Column(
-                children: [
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(20.0)),
-                    margin:
-                        EdgeInsets.only(bottom: 8, top: 8, left: 8, right: 8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text(
-                          qa.name ?? '',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          linkcode.name ?? '',
-                          // style: TextStyle(fontSize: 18),
-                        ),
-                        leading: Icon(
-                          Icons.receipt_long,
+          Positioned.fill(
+            top: titlePosition,
+            child: Align(
+              alignment: Alignment.center,
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 1024),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(20.0)),
+                      margin:
+                          EdgeInsets.only(bottom: 4, top: 8, left: 8, right: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(
+                            qa.name ?? '',
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w400),
+                          ),
+                          subtitle: Text(
+                            linkcode.name ?? '',
+                            // style: TextStyle(fontSize: 18),
+                          ),
+                          leading: Icon(
+                            Icons.receipt_long,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                        '$currentAnswer/$totleQuestions',
-                        style: TextStyle(color: cardLight2),
-                      ),
-                    ),
-                  ),
-                  StepProgressIndicator(
-                    totalSteps: totleQuestions,
-                    currentStep: currentAnswer,
-                    selectedColor: lightBrown,
-                    unselectedColor: cardLight2,
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
+                    Expanded(
                       child: Container(
                         margin: EdgeInsets.zero,
-                        child: Column(
+                        child: ListView(
+                          shrinkWrap: true,
+                          controller: _scrollController,
                           children: [
-                            SizedBox(
-                              height: 32,
-                            ),
                             ..._getQaQuestions(),
                             errormessage.isEmpty
                                 ? SizedBox(
@@ -188,7 +208,12 @@ class _QapageState extends State<Qapage> {
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   ),
-                            sending ? CircularProgressIndicator() : qaButton(),
+                            Align(
+                              alignment: Alignment.center,
+                              child: sending
+                                  ? CircularProgressIndicator()
+                                  : qaButton(),
+                            ),
                             SizedBox(
                               height: 64,
                             ),
@@ -196,14 +221,44 @@ class _QapageState extends State<Qapage> {
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom: 24.0, left: 12, right: 12),
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                '$currentAnswer/$totleQuestions',
+                                style: TextStyle(color: cardLight2),
+                              ),
+                            ),
+                          ),
+                          StepProgressIndicator(
+                            totalSteps: totleQuestions,
+                            currentStep: currentAnswer,
+                            selectedColor: lightBrown,
+                            unselectedColor: cardLight2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  bool positionTitle() {
+    if (_scrollController.hasClients) _scrollController.jumpTo(50.0);
+    return (_scrollController.position.minScrollExtent !=
+        _scrollController.position.maxScrollExtent);
   }
 
   Widget qaButton() {
@@ -286,7 +341,7 @@ class _QapageState extends State<Qapage> {
           RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
       margin: EdgeInsets.only(bottom: 16, top: 8, left: 8, right: 8),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
         child: Column(
           children: [
             ListTile(

@@ -34,6 +34,7 @@ const Color cardLight2 = Color(0xFFAEB0B6);
 // const Color lightBlue = Color(0xFF1877F2);
 const Color lightBlue = Color(0xFF194F96);
 const Color whiteSmoke = Color(0xFFF5F5F5);
+// const Color whiteSmoke = Color(0xFFDDDDDD);
 
 ButtonStyle navElevatedButtonTheme() {
   return ElevatedButton.styleFrom(

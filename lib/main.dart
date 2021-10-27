@@ -159,6 +159,7 @@ ThemeData _buildShrineTheme() {
     // toggleableActiveColor: shrinePink400,
     // primaryColor: lightBlue,
     // scaffoldBackgroundColor: Color(0xFF2B2727),
+    // scaffoldBackgroundColor: backGroundBlack,
     scaffoldBackgroundColor: darkBlueGrey3,
 
     // cardColor: shrineBackgroundWhite,
@@ -166,7 +167,7 @@ ThemeData _buildShrineTheme() {
       backgroundColor: darkBlueGrey3,
     ),
     errorColor: pinkLite,
-    bottomAppBarColor: lightBlue,
+    bottomAppBarColor: lightBrown,
     backgroundColor: darkBlueGrey3,
 
     elevatedButtonTheme: ElevatedButtonThemeData(
