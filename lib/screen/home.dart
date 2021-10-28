@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:ysi/models/project.dart';
 
 import 'package:ysi/network_utils/api.dart';
@@ -23,6 +24,14 @@ class _HomeState extends State<Home> {
   String name = '';
   List<Project?>? projects;
   bool isInit = true;
+
+  final GlobalKey<InnerDrawerState> _innerDrawerKey =
+      GlobalKey<InnerDrawerState>();
+  double _horizontalOffset = 0.4;
+  double _verticalOffset = 0;
+  bool _topBottom = false;
+  double _scale = 0.8;
+  double _borderRadius = 0;
 
   @override
   void initState() {
@@ -51,173 +60,210 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: Colors.grey[400],
-      appBar: AppBar(
-        title: Text('YSI'),
-        actions: [
-          // IconButton(
-          //   icon: Icon(Icons.umbrella),
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => ExampleTwo()),
-          //     );
-          //   },
-          // ),
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditProject()),
-              ).then((value) async {
-                _loadProjectData();
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () async {
-              _loadProjectData();
-            },
-          ),
-        ],
-      ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: lightBrown,
-      //   child: Icon(
-      //     Icons.add,
-      //     color: whiteSmoke,
-      //   ),
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => EditProject()),
-      //     );
-      //   },
-      // ),
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          shrinkWrap: true,
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: blueGrey,
-              ),
-              child: Text('Drawer Header'),
-            ),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Divider(),
-            FractionallySizedBox(
-              widthFactor: .4,
-              child: ElevatedButton(
-                onPressed: () {
-                  logout();
-                },
-                // style: ElevatedButton.styleFrom(
-                //   // primary: Color(0xFF1877F2),
-                //   shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(10))),
-                // ),
-                child: Text('Logout'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: isInit
-          ? spinkit
-          : RefreshIndicator(
-              color: Colors.white,
-              onRefresh: () async {
-                _loadProjectData();
-              },
-              child: ListView(
+    return InnerDrawer(
+      key: _innerDrawerKey,
+      onTapClose: true,
+      offset: IDOffset.only(
+          top: _topBottom ? _verticalOffset : 0.0,
+          bottom: !_topBottom ? _verticalOffset : 0.0,
+          right: (MediaQuery.of(context).size.width > 1024)
+              ? 0
+              : _horizontalOffset,
+          left: (MediaQuery.of(context).size.width > 1024)
+              ? 0
+              : _horizontalOffset),
+      scale: IDOffset.horizontal(
+          (MediaQuery.of(context).size.width > 1024) ? 0.9 : _scale),
+      borderRadius: _borderRadius,
+      // duration: Duration(milliseconds: 11200),
+      // swipe: _swipe,
+      // proportionalChildArea: _proportionalChildArea,
+      // backgroundColor: Colors.red,
+
+      // colorTransitionScaffold: Colors.transparent,
+
+      leftChild: Material(
+          color: Theme.of(context).backgroundColor,
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Center(
-                    child: Container(
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: 16,
-                          ),
-                          Center(
-                            child: Text(
-                              '最新的專案',
-                              style: TextStyle(fontSize: 22),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          if (projects!.isEmpty)
-                            Center(child: Text('目前沒有專案'))
-                          else
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              alignment: WrapAlignment.start,
-                              children: projects!
-                                  .map((item) => projectCard(item!))
-                                  .toList(),
-                            ),
-                          SizedBox(
-                            height: 32,
-                          ),
-                        ],
-                      ),
+                  UserAccountsDrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
                     ),
+                    accountName: Text("曜聖國際"),
+                    accountEmail: Text("xxx@gmail.com"),
+                    currentAccountPicture: Image.asset('web/favicon.png'),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    // Important: Remove any padding from the ListView.
+                    padding: EdgeInsets.zero,
+                    children: [
+                      ListTile(
+                        title: const Text('Item 1'),
+                        onTap: () {
+                          // Update the state of the app.
+                          // ...
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: const Text('Item 1'),
+                        onTap: () {
+                          // Update the state of the app.
+                          // ...
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: const Text('Item 1'),
+                        onTap: () {
+                          // Update the state of the app.
+                          // ...
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: const Text('Item 1'),
+                        onTap: () {
+                          // Update the state of the app.
+                          // ...
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: const Text('Item 1'),
+                        onTap: () {
+                          // Update the state of the app.
+                          // ...
+                        },
+                      ),
+                      Divider(),
+                      FractionallySizedBox(
+                        widthFactor: .4,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            logout();
+                          },
+                          // style: ElevatedButton.styleFrom(
+                          //   // primary: Color(0xFF1877F2),
+                          //   shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.all(Radius.circular(10))),
+                          // ),
+                          child: Text('Logout'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
+          )),
+      scaffold: Scaffold(
+        // backgroundColor: Colors.grey[400],
+        appBar: AppBar(
+          title: Text('YSI'),
+          leading: IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => _innerDrawerKey.currentState!.toggle(),
+          ),
+          actions: [
+            // IconButton(
+            //   icon: Icon(Icons.umbrella),
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => ExampleTwo()),
+            //     );
+            //   },
+            // ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditProject()),
+                ).then((value) async {
+                  _loadProjectData();
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () async {
+                _loadProjectData();
+              },
+            ),
+          ],
+        ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: lightBrown,
+        //   child: Icon(
+        //     Icons.add,
+        //     color: whiteSmoke,
+        //   ),
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => EditProject()),
+        //     );
+        //   },
+        // ),
+        body: isInit
+            ? spinkit
+            : RefreshIndicator(
+                color: Colors.white,
+                onRefresh: () async {
+                  _loadProjectData();
+                },
+                child: ListView(
+                  children: [
+                    Center(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Center(
+                              child: Text(
+                                '最新的專案',
+                                style: TextStyle(fontSize: 22),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            if (projects!.isEmpty)
+                              Center(child: Text('目前沒有專案'))
+                            else
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                alignment: WrapAlignment.start,
+                                children: projects!
+                                    .map((item) => projectCard(item!))
+                                    .toList(),
+                              ),
+                            SizedBox(
+                              height: 32,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
     );
   }
 

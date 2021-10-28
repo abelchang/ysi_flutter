@@ -157,10 +157,11 @@ ThemeData _buildShrineTheme() {
         ),
 
     // toggleableActiveColor: shrinePink400,
-    // primaryColor: lightBlue,
+    primaryColor: darkBlueGrey3,
     // scaffoldBackgroundColor: Color(0xFF2B2727),
     // scaffoldBackgroundColor: backGroundBlack,
     scaffoldBackgroundColor: darkBlueGrey3,
+    secondaryHeaderColor: blueGrey,
 
     // cardColor: shrineBackgroundWhite,
     appBarTheme: AppBarTheme(

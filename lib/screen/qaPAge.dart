@@ -145,12 +145,21 @@ class _QapageState extends State<Qapage> {
             child: Align(
               alignment: Alignment.center,
               child: bannerTitle
-                  ? Text(
-                      '曜聖國際問卷系統',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                      ),
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'web/favicon.png',
+                          width: 48,
+                        ),
+                        Text(
+                          '曜聖國際問卷系統',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                          ),
+                        ),
+                      ],
                     )
                   : Text(
                       '',
