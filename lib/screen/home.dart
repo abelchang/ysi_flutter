@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:ysi/models/project.dart';
+import 'package:ysi/models/user.dart';
 
 import 'package:ysi/network_utils/api.dart';
+import 'package:ysi/providers/authProviders.dart';
 import 'package:ysi/screen/editProject.dart';
 import 'package:ysi/screen/login.dart';
 import 'package:ysi/screen/sysAnswers.dart';
@@ -21,6 +23,7 @@ class _HomeState extends State<Home> {
   String name = '';
   List<Project?>? projects;
   bool isInit = true;
+  User? user;
 
   final GlobalKey<InnerDrawerState> _innerDrawerKey =
       GlobalKey<InnerDrawerState>();
@@ -37,6 +40,7 @@ class _HomeState extends State<Home> {
   }
 
   _loadProjectData() async {
+    user = await SharedPref().getUser();
     if (this.mounted) {
       setState(() {
         isInit = true;
@@ -92,8 +96,8 @@ class _HomeState extends State<Home> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor,
                     ),
-                    accountName: Text("曜聖國際"),
-                    accountEmail: Text("xxx@gmail.com"),
+                    accountName: Text(user?.name ?? "曜聖國際"),
+                    accountEmail: Text(user?.email ?? ''),
                     currentAccountPicture: Image.asset('web/favicon.png'),
                   ),
                   ListView(
@@ -141,8 +145,22 @@ class _HomeState extends State<Home> {
                         },
                       ),
                       Divider(),
-                      FractionallySizedBox(
-                        widthFactor: .4,
+                      // FractionallySizedBox(
+                      //   widthFactor: .4,
+                      //   child: ElevatedButton(
+                      //     onPressed: () {
+                      //       logout();
+                      //     },
+                      //     // style: ElevatedButton.styleFrom(
+                      //     //   // primary: Color(0xFF1877F2),
+                      //     //   shape: RoundedRectangleBorder(
+                      //     //       borderRadius: BorderRadius.all(Radius.circular(10))),
+                      //     // ),
+                      //     child: Text('Logout'),
+                      //   ),
+                      // ),
+                      Align(
+                        alignment: Alignment.center,
                         child: ElevatedButton(
                           onPressed: () {
                             logout();
