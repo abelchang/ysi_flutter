@@ -4,7 +4,6 @@ import 'package:ysi/models/project.dart';
 import 'package:ysi/models/user.dart';
 
 import 'package:ysi/network_utils/api.dart';
-import 'package:ysi/providers/authProviders.dart';
 import 'package:ysi/screen/editProject.dart';
 import 'package:ysi/screen/login.dart';
 import 'package:ysi/screen/sysAnswers.dart';
