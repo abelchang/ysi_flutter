@@ -123,12 +123,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     inputFormatters: [
                                       FilteringTextInputFormatter.deny(' ')
                                     ],
-                                    // scrollPadding: EdgeInsets.only(
-                                    //   bottom: MediaQuery.of(context)
-                                    //           .viewInsets
-                                    //           .bottom +
-                                    //       64,
-                                    // ),
+                                    scrollPadding: EdgeInsets.only(
+                                      bottom: 64,
+                                    ),
                                     style: TextStyle(color: Color(0xFF000000)),
                                     cursorColor: Color(0xFF9b9b9b),
                                     decoration: InputDecoration(

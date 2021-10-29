@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 
 class ExampleTwo extends StatefulWidget {
@@ -15,11 +14,8 @@ class _ExampleTwoState extends State<ExampleTwo> {
       GlobalKey<InnerDrawerState>();
 
   GlobalKey _keyRed = GlobalKey();
-  double _width = 10;
 
-  bool _onTapToClose = false;
   bool _swipe = true;
-  bool _tapScaffold = true;
   InnerDrawerAnimation _animationType = InnerDrawerAnimation.static;
   bool _proportionalChildArea = true;
   double _horizontalOffset = 0.4;
@@ -27,8 +23,6 @@ class _ExampleTwoState extends State<ExampleTwo> {
   bool _topBottom = false;
   double _scale = 0.9;
   double _borderRadius = 50;
-
-  String _title = "Two";
 
   @override
   void initState() {
@@ -47,11 +41,7 @@ class _ExampleTwoState extends State<ExampleTwo> {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       final keyContext = _keyRed.currentContext;
       if (keyContext != null) {
-        final RenderBox box = keyContext.findRenderObject() as RenderBox;
-        final size = box.size;
-        setState(() {
-          _width = size.width;
-        });
+        setState(() {});
       }
     });
   }

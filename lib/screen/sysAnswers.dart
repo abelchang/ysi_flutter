@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:ysi/models/project.dart';
-import 'package:ysi/models/question.dart';
 import 'package:ysi/widgets/styles.dart';
 
 class SysAnswers extends StatefulWidget {

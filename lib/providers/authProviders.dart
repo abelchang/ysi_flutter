@@ -301,6 +301,7 @@ class AuthProvider with ChangeNotifier {
   // }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
+    var result;
     final Map<String, dynamic> data = {
       'email': email,
     };
@@ -308,12 +309,12 @@ class AuthProvider with ChangeNotifier {
     debugPrint("send reset password email request");
 
     var response = await Network().postUnData(data, '/forgot-password');
-    developer.log(
-      'log me',
-      name: 'my.app.AuthProvider_login',
-      error: response,
-    );
-    return jsonDecode(response);
+    if (response['success'] == true) {
+      result = {'success': true, 'message': response['message']};
+    } else {
+      result = {'success': false, 'message': response['message']};
+    }
+    return result;
   }
 
   static onError(error) {
